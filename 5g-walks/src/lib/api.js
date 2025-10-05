@@ -43,9 +43,33 @@ export const routesAPI = {
   shareRoute: (routeId) => api.post(`/routes/${routeId}/share`),
 };
 
+// Walk API - Creates optimal walking routes
+export const walkAPI = {
+  // Create a walking route using the backend /walk endpoint
+  createWalkRoute: async (fromAddr, toAddr, routeType = 'walking', units = 'metric') => {
+    try {
+      // Validate route type - only walking and running allowed
+      if (routeType !== 'walking' && routeType !== 'running') {
+        throw new Error('Only walking and running route types are supported');
+      }
+
+      const response = await api.post('/walk', {
+        from_addr: fromAddr,
+        to: toAddr,
+        route_type: routeType,
+        units: units,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Walk Route Error:', error);
+      throw error;
+    }
+  },
+};
+
 // MapQuest API functions
 export const mapQuestAPI = {
-  // Get directions between two points
+  // Get directions between two points (deprecated - use walkAPI.createWalkRoute instead)
   getDirections: async (start, end, options = {}) => {
     try {
       const response = await axios.get(`${MAPQUEST_BASE_URL}/directions/v2/route`, {

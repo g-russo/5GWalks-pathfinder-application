@@ -49,6 +49,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/create" element={<CreateRoute />} />
+          <Route path="/walk" element={<CreateRoute />} />
           <Route path="/saved" element={<SavedRoutes />} />
           <Route path="/about" element={<About />} />
           <Route path="/route/:id" element={<RouteDetail />} />

@@ -1,10 +1,15 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from typing import Dict, Any
 import os
 import requests
 import logging
 import urllib.parse
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI()
 
@@ -48,13 +53,13 @@ def _human_time(seconds: int) -> str:
 
 
 @app.get("/api/route")
-def get_route(from_addr: str, to: str, units: str = "imperial"):
+def get_route(from_addr: str, to: str, units: str = "metric"):
     """
     Proxy endpoint to MapQuest Directions API.
     Query params:
       - from_addr: origin address or place
       - to: destination address or place
-      - units: "imperial" (miles) or "metric"
+      - units: "metric" (kilometers) or "imperial" (miles)
     """
     key = os.getenv("MAPQUEST_API_KEY") or os.getenv("VITE_MAPQUEST_API_KEY")
     if not key:
@@ -207,3 +212,142 @@ def search_ahead(q: str, maxResults: int = 5):
     Lightweight autocomplete using geocoding endpoint (returns top matches).
     """
     return place_search(q=q, maxResults=maxResults)
+
+
+@app.post('/api/walk')
+def create_walk_route(request_body: Dict[str, Any] = Body(...)):
+    """
+    Create an optimal walking route using MapQuest API.
+    Only supports pedestrian modes: walking and running.
+    
+    Request body:
+    {
+        "from_addr": "start address",
+        "to": "destination address",
+        "route_type": "walking" or "running",
+        "units": "metric" or "imperial" (optional, defaults to metric)
+    }
+    """
+    from_addr = request_body.get('from_addr')
+    to = request_body.get('to')
+    route_type = request_body.get('route_type', 'walking')
+    units = request_body.get('units', 'metric')
+    
+    # Validate inputs
+    if not from_addr or not to:
+        raise HTTPException(status_code=400, detail="Both 'from_addr' and 'to' are required")
+    
+    # Only allow walking and running
+    if route_type not in ['walking', 'running']:
+        raise HTTPException(status_code=400, detail="route_type must be 'walking' or 'running'")
+    
+    key = os.getenv("MAPQUEST_API_KEY") or os.getenv("VITE_MAPQUEST_API_KEY")
+    if not key:
+        raise HTTPException(status_code=500, detail="MapQuest API key not configured on backend (MAPQUEST_API_KEY).")
+
+    unit_param = "k" if units == "metric" else "m"
+    
+    # MapQuest pedestrian routing parameters
+    params = {
+        "key": key,
+        "from": from_addr,
+        "to": to,
+        "unit": unit_param,
+        "routeType": "pedestrian",  # Always use pedestrian routing
+        "narrativeType": "text",
+    }
+
+    url = "http://www.mapquestapi.com/directions/v2/route"
+    try:
+        resp = requests.get(url, params=params, timeout=15)
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"Error contacting MapQuest: {e}")
+
+    if resp.status_code != 200:
+        try:
+            body = resp.json()
+            raise HTTPException(status_code=resp.status_code, detail=body)
+        except Exception:
+            raise HTTPException(status_code=resp.status_code, detail="MapQuest returned an error")
+
+    data = resp.json()
+    route = data.get("route")
+    if not route:
+        raise HTTPException(status_code=404, detail="No route data returned by MapQuest")
+
+    distance = route.get("distance")
+    time_seconds = route.get("time")
+    formatted_time = _human_time(time_seconds)
+
+    # Extract turn-by-turn directions
+    steps = []
+    for leg in route.get("legs", []):
+        for maneuver in leg.get("maneuvers", []):
+            steps.append({
+                "narrative": maneuver.get("narrative"),
+                "distance": maneuver.get("distance"),
+                "time": maneuver.get("time"),
+            })
+
+    # Extract shape points (flat list: lat,lng,lat,lng,...) -> convert to [[lat,lng],...]
+    shape_points = []
+    try:
+        flat = route.get('shape', {}).get('shapePoints') or []
+        for i in range(0, len(flat), 2):
+            lat = flat[i]
+            lng = flat[i+1] if i+1 < len(flat) else None
+            if lng is not None:
+                shape_points.append([lat, lng])
+    except Exception:
+        shape_points = []
+
+    # Normalized locations (start/end) if available
+    norm_locations = []
+    try:
+        for loc in route.get('locations', []) or []:
+            latlng = loc.get('latLng') or {}
+            norm_locations.append({
+                'display': ', '.join([p for p in [loc.get('street'), loc.get('adminArea5'), loc.get('adminArea3')] if p]) or loc.get('adminArea5') or '',
+                'lat': latlng.get('lat'),
+                'lng': latlng.get('lng')
+            })
+    except Exception:
+        norm_locations = []
+
+    # Construct a MapQuest Static Map URL for a preview image
+    try:
+        from urllib.parse import urlencode
+        static_base = "https://www.mapquestapi.com/staticmap/v5/map"
+        static_params = {
+            "key": key,
+            "size": "800,400",
+            "start": from_addr,
+            "end": to,
+            "routeColor": "FC4C02",  # Strava orange
+            "routeWidth": "6",
+        }
+        static_map_url = f"{static_base}?{urlencode(static_params)}"
+    except Exception:
+        static_map_url = None
+
+    # MapQuest directions URL
+    try:
+        directions_base = "https://www.mapquest.com/directions"
+        directions_link = f"{directions_base}/{urllib.parse.quote(from_addr)}/{urllib.parse.quote(to)}"
+    except Exception:
+        directions_link = None
+
+    return {
+        "success": True,
+        "route_type": route_type,
+        "distance": distance,
+        "time_seconds": time_seconds,
+        "formatted_time": formatted_time,
+        "units": "km" if unit_param == "k" else "miles",
+        "steps": steps,
+        "shape": shape_points,
+        "locations": norm_locations,
+        "static_map_url": static_map_url,
+        "directions_link": directions_link,
+        "raw": route,
+    }
