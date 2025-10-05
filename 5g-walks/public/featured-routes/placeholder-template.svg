@@ -1,0 +1,10 @@
+<!-- Placeholder SVG - Replace with actual image -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect fill="#f5f5f5" width="1200" height="800"/>
+  <text fill="#999" font-family="Arial, sans-serif" font-size="48" font-weight="bold" x="50%" y="45%" text-anchor="middle">
+    BGC Skyline Walk
+  </text>
+  <text fill="#bbb" font-family="Arial, sans-serif" font-size="24" x="50%" y="55%" text-anchor="middle">
+    Add your image here
+  </text>
+</svg>

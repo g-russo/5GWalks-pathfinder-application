@@ -1,0 +1,531 @@
+/* ========================================
+   ABOUT PAGE - STRAVA INSPIRED DESIGN
+   ======================================== */
+
+.about-page {
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Grid Background */
+.grid-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.grid-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(to right, rgba(252, 76, 2, 0.3) 2px, transparent 2px),
+    linear-gradient(to bottom, rgba(252, 76, 2, 0.3) 2px, transparent 2px);
+  background-size: 60px 60px;
+  opacity: 1;
+}
+
+/* Animated Glowing Lines */
+.glow-line {
+  position: absolute;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(252, 76, 2, 0) 10%,
+    rgba(252, 76, 2, 1) 50%, 
+    rgba(252, 76, 2, 0) 90%,
+    transparent 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.glow-line-horizontal {
+  height: 4px;
+  width: 250px;
+  filter: blur(3px);
+  box-shadow: 0 0 15px rgba(252, 76, 2, 1), 0 0 30px rgba(252, 76, 2, 0.6), 0 0 45px rgba(252, 76, 2, 0.3);
+}
+
+.glow-line-vertical {
+  width: 4px;
+  height: 250px;
+  filter: blur(3px);
+  box-shadow: 0 0 15px rgba(252, 76, 2, 1), 0 0 30px rgba(252, 76, 2, 0.6), 0 0 45px rgba(252, 76, 2, 0.3);
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(252, 76, 2, 0) 10%,
+    rgba(252, 76, 2, 1) 50%, 
+    rgba(252, 76, 2, 0) 90%,
+    transparent 100%
+  );
+}
+
+@keyframes glowHorizontal1 {
+  0% { left: -200px; opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+@keyframes glowHorizontal2 {
+  0% { left: -200px; opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+@keyframes glowVertical1 {
+  0% { top: -200px; opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes glowVertical2 {
+  0% { top: -200px; opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.glow-line-1 {
+  top: 15%;
+  animation: glowHorizontal1 8s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.glow-line-2 {
+  top: 45%;
+  animation: glowHorizontal2 10s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.glow-line-3 {
+  top: 75%;
+  animation: glowHorizontal1 9s ease-in-out infinite;
+  animation-delay: 4s;
+}
+
+.glow-line-4 {
+  left: 25%;
+  animation: glowVertical1 11s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.glow-line-5 {
+  left: 55%;
+  animation: glowVertical2 9s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+.glow-line-6 {
+  left: 85%;
+  animation: glowVertical1 10s ease-in-out infinite;
+  animation-delay: 5s;
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+
+.about-hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 0 4rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+  z-index: 1;
+}
+
+.about-hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.2;
+  animation: float 15s ease-in-out infinite;
+}
+
+.hero-gradient-orb.orb-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--strava-orange);
+  top: -20%;
+  right: 10%;
+}
+
+.hero-gradient-orb.orb-2 {
+  width: 350px;
+  height: 350px;
+  background: #ff6b35;
+  bottom: -10%;
+  left: 5%;
+  animation-delay: 5s;
+}
+
+.about-hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.about-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  color: var(--pure-white);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.about-hero-subtitle {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ========================================
+   SECTIONS
+   ======================================== */
+
+.about-section {
+  padding: 5rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  color: var(--jet-black);
+  text-align: center !important;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 3rem;
+  letter-spacing: -0.02em;
+  width: 100%;
+}
+
+/* ========================================
+   MISSION SECTION
+   ======================================== */
+
+.mission-section {
+  background: rgba(250, 250, 250, 0.7);
+  overflow: hidden;
+}
+
+.mission-wrapper {
+  position: relative;
+}
+
+.mission-lines-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  max-width: 1400px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.mission-content {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.mission-container {
+  background: #ffffff;
+  border: 3px solid var(--strava-orange);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 8px 32px rgba(252, 76, 2, 0.15);
+}
+
+.mission-text {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: rgba(13, 13, 13, 0.8);
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.mission-text:last-child {
+  margin-bottom: 0;
+}
+
+/* ========================================
+   VALUES SECTION
+   ======================================== */
+
+.values-section {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.value-card {
+  background: #ffffff;
+  border: 1px solid rgba(13, 13, 13, 0.08);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.value-card:hover {
+  box-shadow: 0 12px 40px rgba(252, 76, 2, 0.15);
+  border-color: var(--strava-orange);
+}
+
+.value-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(252, 76, 2, 0.1), rgba(255, 107, 53, 0.05));
+  border-radius: 50%;
+  color: var(--strava-orange);
+}
+
+.value-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--jet-black);
+  margin-bottom: 1rem;
+}
+
+.value-description {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(13, 13, 13, 0.7);
+  margin: 0;
+}
+
+/* ========================================
+   TEAM SECTION
+   ======================================== */
+
+.team-section {
+  background: rgba(250, 250, 250, 0.7);
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.team-card {
+  background: #ffffff;
+  border: 1px solid rgba(13, 13, 13, 0.08);
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.team-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  border-color: var(--strava-orange);
+}
+
+.team-avatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--strava-orange), #ff6b35);
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--pure-white);
+  box-shadow: 0 8px 24px rgba(252, 76, 2, 0.3);
+}
+
+.team-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--jet-black);
+  margin-bottom: 0.5rem;
+}
+
+.team-role {
+  font-size: 0.95rem;
+  color: var(--strava-orange);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.team-description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(13, 13, 13, 0.7);
+  margin: 0;
+}
+
+/* ========================================
+   CTA SECTION
+   ======================================== */
+
+.cta-section {
+  background: linear-gradient(135deg, var(--jet-black) 0%, #1a1a1a 100%);
+  text-align: center;
+  padding: 6rem 0;
+}
+
+.cta-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  color: var(--pure-white);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.cta-text {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--strava-orange), #ff6b35);
+  color: var(--pure-white);
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(252, 76, 2, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-large {
+  padding: 1.25rem 3rem;
+  font-size: 1.1rem;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 12px 40px rgba(252, 76, 2, 0.6);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .team-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-section {
+    padding: 3rem 0;
+  }
+
+  .mission-container {
+    padding: 2.5rem 2rem;
+    border-width: 2px;
+  }
+
+  .mission-lines-bg {
+    opacity: 0.4;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .value-card,
+  .team-card {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-hero {
+    padding: 4rem 0 3rem;
+  }
+
+  .mission-container {
+    padding: 2rem 1.5rem;
+    border-width: 2px;
+    border-radius: 16px;
+  }
+
+  .mission-text {
+    font-size: 1rem;
+  }
+
+  .mission-lines-bg {
+    opacity: 0.3;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .cta-section {
+    padding: 4rem 0;
+  }
+}

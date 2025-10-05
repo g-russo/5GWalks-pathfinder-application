@@ -1,0 +1,333 @@
+/* Create Route Page - Strava Inspired Design */
+
+.create-route-page {
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+  padding: 60px 0;
+}
+
+.create-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* Page Header */
+.create-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.create-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--jet-black);
+  margin: 0 0 16px 0;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.create-subtitle {
+  font-size: 1.125rem;
+  color: rgba(13, 13, 13, 0.6);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Two Column Grid */
+.create-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* Form Column */
+.form-column {
+  position: relative;
+}
+
+.form-wrapper {
+  position: sticky;
+  top: 100px;
+  background: var(--pure-white);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(13, 13, 13, 0.08);
+}
+
+/* Error Banner */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  color: #dc2626;
+  font-size: 0.95rem;
+  overflow: hidden;
+}
+
+.error-banner p {
+  margin: 0;
+  flex: 1;
+}
+
+/* Map Column */
+.map-column {
+  position: relative;
+}
+
+.map-wrapper {
+  position: sticky;
+  top: 100px;
+  background: var(--pure-white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(13, 13, 13, 0.08);
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Map States */
+.map-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 40px;
+  width: 100%;
+}
+
+/* Loading State */
+.loading-state .spinner {
+  color: var(--strava-orange);
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--jet-black);
+  margin: 0 0 8px 0;
+}
+
+.loading-state p {
+  font-size: 1rem;
+  color: rgba(13, 13, 13, 0.6);
+  margin: 0;
+}
+
+/* Empty State */
+.empty-state {
+  color: rgba(13, 13, 13, 0.4);
+}
+
+.empty-icon {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(252, 76, 2, 0.05);
+  border-radius: 50%;
+  margin: 0 auto 24px;
+}
+
+.empty-icon svg {
+  color: var(--strava-orange);
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(13, 13, 13, 0.5);
+  margin: 0 0 12px 0;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: rgba(13, 13, 13, 0.4);
+  max-width: 400px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Route Preview */
+.route-preview {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-header {
+  padding: 32px 32px 24px;
+  border-bottom: 1px solid rgba(13, 13, 13, 0.08);
+}
+
+.preview-header h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--jet-black);
+  margin: 0 0 16px 0;
+}
+
+.route-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(13, 13, 13, 0.7);
+}
+
+.stat svg {
+  color: var(--strava-orange);
+}
+
+/* Map Container */
+.map-container {
+  flex: 1;
+  min-height: 400px;
+  background: #f5f5f5;
+  position: relative;
+}
+
+/* Save Button */
+.btn-save-route {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: calc(100% - 64px);
+  margin: 24px 32px 32px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, var(--strava-orange), #ff6b35);
+  color: var(--pure-white);
+  border: none;
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(252, 76, 2, 0.3);
+}
+
+.btn-save-route:hover {
+  box-shadow: 0 6px 20px rgba(252, 76, 2, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-save-route:active {
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .create-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .form-wrapper,
+  .map-wrapper {
+    position: static;
+  }
+
+  .map-wrapper {
+    min-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .create-route-page {
+    padding: 40px 0;
+  }
+
+  .create-container {
+    padding: 0 24px;
+  }
+
+  .create-header {
+    margin-bottom: 40px;
+  }
+
+  .form-wrapper {
+    padding: 32px 24px;
+  }
+
+  .map-wrapper {
+    min-height: 450px;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-route-page {
+    padding: 32px 0;
+  }
+
+  .create-container {
+    padding: 0 20px;
+  }
+
+  .create-title {
+    font-size: 2rem;
+  }
+
+  .create-subtitle {
+    font-size: 1rem;
+  }
+
+  .form-wrapper {
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+
+  .map-wrapper {
+    min-height: 400px;
+    border-radius: 16px;
+  }
+
+  .preview-header {
+    padding: 24px 20px 20px;
+  }
+
+  .btn-save-route {
+    width: calc(100% - 40px);
+    margin: 20px 20px 24px;
+  }
+}
