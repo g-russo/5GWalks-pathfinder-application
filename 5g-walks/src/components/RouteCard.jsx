@@ -15,15 +15,6 @@ export default function RouteCard({ route, onView }) {
       onHoverEnd={() => setIsCardHovered(false)}
       onClick={() => onView?.(route.id)}
     >
-      {/* Card background with gradient on hover */}
-      <motion.div 
-        className="card-bg"
-        animate={{
-          background: isCardHovered
-            ? 'linear-gradient(135deg, rgba(252, 76, 2, 0.05), rgba(255, 107, 53, 0.02))'
-            : 'linear-gradient(135deg, #ffffff, #ffffff)'
-        }}
-      />
 
       {/* Card image */}
       {route.image && (

@@ -112,7 +112,20 @@ export default function Home() {
       </section>
 
       {/* Featured Routes */}
-      <section className="featured-section section-lg">
+      <section id="featured-routes" className="featured-section section-lg">
+        {/* Grid Background with Glowing Lines */}
+        <div className="featured-grid-background">
+          <div className="featured-grid-pattern"></div>
+          {/* Horizontal glowing lines */}
+          <div className="featured-glow-line featured-glow-line-horizontal featured-glow-line-1"></div>
+          <div className="featured-glow-line featured-glow-line-horizontal featured-glow-line-2"></div>
+          <div className="featured-glow-line featured-glow-line-horizontal featured-glow-line-3"></div>
+          {/* Vertical glowing lines */}
+          <div className="featured-glow-line featured-glow-line-vertical featured-glow-line-4"></div>
+          <div className="featured-glow-line featured-glow-line-vertical featured-glow-line-5"></div>
+          <div className="featured-glow-line featured-glow-line-vertical featured-glow-line-6"></div>
+        </div>
+
         <div className="container">
           <motion.div
             className="section-header"
@@ -120,24 +133,24 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="section-title">
-              Featured Routes
-              <span className="title-accent"></span>
-            </h2>
-            <p className="section-subtitle">
-              Explore the best walking routes around Metro Manila
-              {isPreGenerating && (
-                <span style={{ 
-                  display: 'inline-block', 
-                  marginLeft: '0.5rem', 
-                  color: 'var(--strava-orange)',
-                  fontSize: '0.875rem',
-                  fontWeight: 600
-                }}>
-                  🗺️ Pre-loading routes for instant viewing...
-                </span>
-              )}
-            </p>
+            <div>
+              <h2 className="featured-section-title">
+                Featured Routes
+              </h2>
+              <p className="section-subtitle">
+                Explore the best walking routes around Metro Manila
+                {isPreGenerating && (
+                  <span style={{ 
+                    display: 'inline-block', 
+                    marginLeft: '0.5rem', 
+                    fontSize: '0.875rem',
+                    fontWeight: 600
+                  }}>
+                    🗺️ Pre-loading routes for instant viewing...
+                  </span>
+                )}
+              </p>
+            </div>
           </motion.div>
 
           <div className="routes-grid">

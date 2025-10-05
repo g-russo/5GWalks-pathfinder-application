@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { AlertCircle, PersonStanding, Footprints } from 'lucide-react';
 
 export default function RouteForm({ onSubmit, initialData }) {
   // Ensure initialData is always an object, even if null or undefined is passed
@@ -14,6 +15,9 @@ export default function RouteForm({ onSubmit, initialData }) {
     endLocation: safeInitialData.endLocation || '',
     routeType: safeInitialData.routeType || 'walking',
   });
+
+  const [validationErrors, setValidationErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
   // Update form when initialData changes (e.g., navigating from featured routes)
   useEffect(() => {
@@ -34,11 +38,64 @@ export default function RouteForm({ onSubmit, initialData }) {
       ...prev,
       [name]: value,
     }));
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleBlur = (fieldName) => {
+    setTouched(prev => ({ ...prev, [fieldName]: true }));
+    validateField(fieldName, formData[fieldName]);
+  };
+
+  const validateField = (fieldName, value) => {
+    let error = '';
+    
+    switch (fieldName) {
+      case 'name':
+        if (!value.trim()) {
+          error = 'Route name is required';
+        } else if (value.trim().length < 3) {
+          error = 'Route name must be at least 3 characters';
+        }
+        break;
+      case 'startLocation':
+        if (!value.trim()) {
+          error = 'Start location is required';
+        }
+        break;
+      case 'endLocation':
+        if (!value.trim()) {
+          error = 'End location is required';
+        }
+        break;
+    }
+    
+    setValidationErrors(prev => ({ ...prev, [fieldName]: error }));
+    return !error;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    
+    // Mark all fields as touched
+    setTouched({
+      name: true,
+      startLocation: true,
+      endLocation: true,
+    });
+    
+    // Validate all fields
+    const isNameValid = validateField('name', formData.name);
+    const isStartValid = validateField('startLocation', formData.startLocation);
+    const isEndValid = validateField('endLocation', formData.endLocation);
+    
+    // Only submit if all fields are valid
+    if (isNameValid && isStartValid && isEndValid) {
+      onSubmit(formData);
+    }
   };
 
   return (
@@ -60,12 +117,18 @@ export default function RouteForm({ onSubmit, initialData }) {
             id="name"
             name="name"
             type="text"
-            placeholder="e.g., Morning Park Walk"
+            placeholder="e.g., Morning Walk to Rizal Park"
             value={formData.name}
             onChange={handleChange}
-            className="form-input"
-            required
+            onBlur={() => handleBlur('name')}
+            className={`form-input ${validationErrors.name && touched.name ? 'input-error' : ''}`}
           />
+          {validationErrors.name && touched.name && (
+            <div className="validation-error">
+              <AlertCircle size={16} />
+              <span>{validationErrors.name}</span>
+            </div>
+          )}
         </div>
 
         <div className="form-section">
@@ -88,61 +151,89 @@ export default function RouteForm({ onSubmit, initialData }) {
 
         <div className="form-section">
           <label htmlFor="startLocation" className="form-label">
-            <span className="label-text">📍 Start Location</span>
+            <span className="label-text">Start Location</span>
             <span className="label-required">*</span>
           </label>
           <Input
             id="startLocation"
             name="startLocation"
             type="text"
-            placeholder="e.g., Times Square, New York, NY"
+            placeholder="e.g., University of Santo Tomas, Manila"
             value={formData.startLocation}
             onChange={handleChange}
-            className="form-input"
-            required
+            onBlur={() => handleBlur('startLocation')}
+            className={`form-input ${validationErrors.startLocation && touched.startLocation ? 'input-error' : ''}`}
           />
+          {validationErrors.startLocation && touched.startLocation && (
+            <div className="validation-error">
+              <AlertCircle size={16} />
+              <span>{validationErrors.startLocation}</span>
+            </div>
+          )}
         </div>
 
         <div className="form-section">
           <label htmlFor="endLocation" className="form-label">
-            <span className="label-text">🎯 End Location</span>
+            <span className="label-text">End Location</span>
             <span className="label-required">*</span>
           </label>
           <Input
             id="endLocation"
             name="endLocation"
             type="text"
-            placeholder="e.g., Central Park, New York, NY"
+            placeholder="e.g., Rizal Park, Manila"
             value={formData.endLocation}
             onChange={handleChange}
-            className="form-input"
-            required
+            onBlur={() => handleBlur('endLocation')}
+            className={`form-input ${validationErrors.endLocation && touched.endLocation ? 'input-error' : ''}`}
           />
+          {validationErrors.endLocation && touched.endLocation && (
+            <div className="validation-error">
+              <AlertCircle size={16} />
+              <span>{validationErrors.endLocation}</span>
+            </div>
+          )}
         </div>
 
         <div className="form-divider"></div>
 
         <div className="form-section">
-          <label htmlFor="routeType" className="form-label">
+          <label className="form-label">
             <span className="label-text">Activity Type</span>
             <span className="label-required">*</span>
           </label>
-          <select
-            id="routeType"
-            name="routeType"
-            value={formData.routeType}
-            onChange={handleChange}
-            className="form-select"
-          >
-            <option value="walking">🚶 Walking</option>
-            <option value="running">🏃 Running</option>
-          </select>
+          <div className="radio-group">
+            <label className={`radio-option ${formData.routeType === 'walking' ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="routeType"
+                value="walking"
+                checked={formData.routeType === 'walking'}
+                onChange={handleChange}
+              />
+              <div className="radio-content">
+                <PersonStanding size={20} />
+                <span>Walking</span>
+              </div>
+            </label>
+            <label className={`radio-option ${formData.routeType === 'running' ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="routeType"
+                value="running"
+                checked={formData.routeType === 'running'}
+                onChange={handleChange}
+              />
+              <div className="radio-content">
+                <Footprints size={20} />
+                <span>Running</span>
+              </div>
+            </label>
+          </div>
         </div>
 
         <button type="submit" className="form-submit-btn">
-          <span className="btn-icon">🗺️</span>
           <span className="btn-text">Generate Route</span>
-          <span className="btn-arrow">→</span>
         </button>
       </form>
     </div>

@@ -5,7 +5,7 @@ import { ArrowLeft, Share2, Heart, MapPin, Clock, Navigation, Loader2, Info, Foo
 import MapView from '../components/MapView';
 import { walkAPI } from '../lib/api';
 import { FEATURED_ROUTES, getCachedRouteData } from '../constants/featuredRoutes';
-import '../styles/CreateRoute.css';
+import '../styles/RouteDetail.css';
 
 export default function RouteDetail() {
   const { id } = useParams();
@@ -89,36 +89,30 @@ export default function RouteDetail() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="create-route-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)' }}>
+      <div className="route-detail-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <motion.div
           className="loading-container"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          style={{ textAlign: 'center', padding: '3rem', maxWidth: '500px' }}
         >
           <motion.div
+            className="loading-spinner"
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            style={{ display: 'inline-block', marginBottom: '1.5rem' }}
           >
             <Loader2 size={64} style={{ color: 'var(--strava-orange)' }} />
           </motion.div>
-          <h3 style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--jet-black)', marginBottom: '0.75rem' }}>
+          <h3 className="loading-title">
             🗺️ Generating Your Walking Route
           </h3>
-          <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '1rem' }}>
+          <p className="loading-description">
             Creating the optimal path from UST to your destination...
           </p>
           <motion.div
+            className="loading-progress"
             initial={{ width: 0 }}
             animate={{ width: '100%' }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            style={{
-              height: '4px',
-              background: 'linear-gradient(90deg, var(--strava-orange), #ff8c42)',
-              borderRadius: '2px',
-              marginTop: '1.5rem'
-            }}
           />
         </motion.div>
       </div>
@@ -128,7 +122,7 @@ export default function RouteDetail() {
   // Error state
   if (error && !featuredRoute) {
     return (
-      <div className="create-route-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="route-detail-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <motion.div
           style={{ textAlign: 'center', padding: '2rem' }}
           initial={{ opacity: 0, y: 20 }}
@@ -137,10 +131,18 @@ export default function RouteDetail() {
           <Info size={64} style={{ color: '#ef4444', margin: '0 auto 1rem' }} />
           <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Route Not Found</h3>
           <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>{error}</p>
-          <Button onClick={() => navigate('/')}>
-            <ArrowLeft size={18} style={{ marginRight: '0.5rem' }} />
-            Back to Home
-          </Button>
+          <button className="back-button" onClick={() => {
+            navigate('/');
+            setTimeout(() => {
+              const featuredSection = document.getElementById('featured-routes');
+              if (featuredSection) {
+                featuredSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }, 100);
+          }}>
+            <ArrowLeft size={18} />
+            Featured Routes
+          </button>
         </motion.div>
       </div>
     );
@@ -148,117 +150,99 @@ export default function RouteDetail() {
 
   return (
     <motion.div 
-      className="create-route-page"
+      className="route-detail-page"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="create-container">
+      {/* Grid Background with Glowing Lines */}
+      <div className="grid-background">
+        <div className="grid-pattern"></div>
+        {/* Horizontal glowing lines */}
+        <div className="glow-line glow-line-horizontal glow-line-1"></div>
+        <div className="glow-line glow-line-horizontal glow-line-2"></div>
+        <div className="glow-line glow-line-horizontal glow-line-3"></div>
+        {/* Vertical glowing lines */}
+        <div className="glow-line glow-line-vertical glow-line-4"></div>
+        <div className="glow-line glow-line-vertical glow-line-5"></div>
+        <div className="glow-line glow-line-vertical glow-line-6"></div>
+      </div>
+
+      <div className="route-detail-container">
         {/* Back Button */}
         <motion.button
           className="back-button"
-          onClick={() => navigate('/')}
+          onClick={() => {
+            navigate('/');
+            setTimeout(() => {
+              const featuredSection = document.getElementById('featured-routes');
+              if (featuredSection) {
+                featuredSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }, 100);
+          }}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           whileHover={{ x: -5 }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.75rem 1.25rem',
-            background: 'transparent',
-            border: '2px solid #e5e7eb',
-            borderRadius: '12px',
-            color: 'var(--jet-black)',
-            fontWeight: 600,
-            cursor: 'pointer',
-            marginBottom: '2rem',
-            transition: 'all 0.3s ease',
-          }}
         >
           <ArrowLeft size={20} />
-          Back to Home
+          Featured Routes
         </motion.button>
 
         {/* Page Header with Route Info */}
         <motion.div
-          className="create-header"
+          className="route-detail-header"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          style={{ marginBottom: '2rem' }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ flex: 1 }}>
-              <h1 className="create-title" style={{ marginBottom: '0.75rem' }}>
+          <div className="route-detail-header-content">
+            <div className="route-detail-info">
+              <h1 className="route-detail-title">
                 {featuredRoute?.name || 'Featured Route'}
               </h1>
-              <p className="create-subtitle" style={{ fontSize: '1.125rem', marginBottom: '1rem' }}>
+              <p className="route-detail-description">
                 {featuredRoute?.description}
               </p>
               
               {/* Route Stats */}
-              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <MapPin size={20} style={{ color: 'var(--strava-orange)' }} />
-                  <span style={{ fontWeight: 600 }}>
+              <div className="route-stats">
+                <div className="route-stat">
+                  <MapPin size={20} />
+                  <span>
                     {routeData?.distance ? `${routeData.distance.toFixed(2)} km` : `${featuredRoute?.distance} km`}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Clock size={20} style={{ color: 'var(--strava-orange)' }} />
-                  <span style={{ fontWeight: 600 }}>
+                <div className="route-stat">
+                  <Clock size={20} />
+                  <span>
                     {routeData?.formattedTime || `${featuredRoute?.duration} min`}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Footprints size={20} style={{ color: 'var(--strava-orange)' }} />
-                  <span style={{ fontWeight: 600 }}>{featuredRoute?.type || 'Walking'}</span>
+                <div className="route-stat">
+                  <Footprints size={20} />
+                  <span>{featuredRoute?.type || 'Walking'}</span>
                 </div>
               </div>
             </div>
             
             {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <div className="route-actions">
               <motion.button
+                className={`action-button favorite ${isFavorited ? 'active' : ''}`}
                 onClick={handleFavorite}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem 1.25rem',
-                  background: isFavorited ? 'var(--strava-orange)' : 'white',
-                  border: '2px solid var(--strava-orange)',
-                  borderRadius: '12px',
-                  color: isFavorited ? 'white' : 'var(--strava-orange)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                }}
               >
                 <Heart size={18} fill={isFavorited ? 'white' : 'none'} />
                 {isFavorited ? 'Saved' : 'Save'}
               </motion.button>
               
               <motion.button
+                className="action-button share"
                 onClick={handleShare}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem 1.25rem',
-                  background: 'white',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '12px',
-                  color: 'var(--jet-black)',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                }}
               >
                 <Share2 size={18} />
                 Share
@@ -271,169 +255,115 @@ export default function RouteDetail() {
         <AnimatePresence>
           {error && featuredRoute && (
             <motion.div
+              className="error-message"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              style={{
-                padding: '1rem',
-                background: '#FFF4E6',
-                border: '2px solid #FFD699',
-                borderRadius: '12px',
-                marginBottom: '2rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-              }}
             >
-              <Info size={20} style={{ color: '#FF6B00', flexShrink: 0 }} />
-              <p style={{ color: '#8B4000', margin: 0 }}>{error}</p>
+              <Info size={20} />
+              <p>{error}</p>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Main Content Grid */}
-        <div className="create-grid" style={{ gridTemplateColumns: '1fr', gap: '2rem' }}>
+        <div className="route-detail-grid">
           
           {/* Map Section */}
           <motion.div
-            className="preview-column"
+            className="map-section"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <div className="preview-header" style={{ marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Navigation size={24} style={{ color: 'var(--strava-orange)' }} />
+            <div className="map-section-header">
+              <h3 className="map-section-title">
+                <Navigation size={24} />
                 Walking Route
               </h3>
-              <p style={{ color: '#6b7280', marginTop: '0.25rem' }}>
+              <p className="map-section-description">
                 View your path on the interactive map below
               </p>
             </div>
 
-            <div className="map-container" style={{ borderRadius: '16px', overflow: 'hidden', minHeight: '500px' }}>
+            <div className="map-container">
               {routeData ? (
                 <MapView route={routeData} />
               ) : (
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  minHeight: '500px',
-                  background: '#f3f4f6',
-                  color: '#6b7280'
-                }}>
+                <div className="map-unavailable">
                   <p>Map unavailable</p>
                 </div>
               )}
             </div>
-          </motion.div>
 
-          {/* Route Details Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            style={{
-              background: 'white',
-              borderRadius: '16px',
-              padding: '2rem',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-            }}
-          >
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Info size={24} style={{ color: 'var(--strava-orange)' }} />
-              Route Information
-            </h3>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Route Information - Below Map */}
+            <div className="route-info-below-map">
               {/* Start Location */}
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <MapPin size={18} style={{ color: '#22c55e' }} />
-                  <span style={{ fontWeight: 600, fontSize: '0.875rem', color: '#6b7280', textTransform: 'uppercase' }}>
-                    Start Point
-                  </span>
+              <div className="location-info">
+                <div className="location-label start">
+                  <MapPin size={18} />
+                  <span>Start Point</span>
                 </div>
-                <p style={{ fontSize: '1.125rem', fontWeight: 500, margin: 0, paddingLeft: '1.625rem' }}>
+                <p className="location-text">
                   {featuredRoute?.startLocation}
                 </p>
               </div>
 
               {/* End Location */}
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <MapPin size={18} style={{ color: '#ef4444' }} />
-                  <span style={{ fontWeight: 600, fontSize: '0.875rem', color: '#6b7280', textTransform: 'uppercase' }}>
-                    Destination
-                  </span>
+              <div className="location-info">
+                <div className="location-label destination">
+                  <MapPin size={18} />
+                  <span>Destination</span>
                 </div>
-                <p style={{ fontSize: '1.125rem', fontWeight: 500, margin: 0, paddingLeft: '1.625rem' }}>
+                <p className="location-text">
                   {featuredRoute?.endLocation}
                 </p>
               </div>
-
-              {/* Divider */}
-              <div style={{ height: '1px', background: '#e5e7eb', margin: '0.5rem 0' }} />
-
-              {/* Turn-by-Turn Directions */}
-              {routeData?.steps && routeData.steps.length > 0 && (
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                    <Navigation size={20} style={{ color: 'var(--strava-orange)' }} />
-                    <span style={{ fontWeight: 700, fontSize: '1.125rem' }}>
-                      Turn-by-Turn Directions
-                    </span>
-                  </div>
-                  
-                  <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                    {routeData.steps.map((step, index) => (
-                      <div 
-                        key={index}
-                        style={{
-                          display: 'flex',
-                          gap: '1rem',
-                          padding: '1rem',
-                          background: index % 2 === 0 ? '#f9fafb' : 'white',
-                          borderRadius: '8px',
-                          marginBottom: '0.5rem',
-                        }}
-                      >
-                        <div style={{
-                          minWidth: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          background: 'var(--strava-orange)',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 700,
-                          fontSize: '0.875rem',
-                        }}>
-                          {index + 1}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                            {step.narrative.replace(/Go for[^.]*\.?\s*/gi, '')}
-                          </p>
-                          {typeof step.distance === 'number' && (
-                            <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-                              {step.distance < 0.1 
-                                ? '0.00 m'
-                                : step.distance < 1 
-                                  ? `${Math.round(step.distance * 1000)} m` 
-                                  : `${step.distance.toFixed(2)} km`}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </motion.div>
+
+          {/* Turn-by-Turn Directions Section */}
+          {routeData?.steps && routeData.steps.length > 0 && (
+            <motion.div
+              className="route-details-section"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              {/* Turn-by-Turn Directions */}
+              <div className="directions-section">
+                <div className="directions-header">
+                  <Navigation size={20} />
+                  <span>Turn-by-Turn Directions</span>
+                </div>
+                
+                <div className="directions-list">
+                  {routeData.steps.map((step, index) => (
+                    <div 
+                      key={index}
+                      className="direction-step"
+                    >
+                      <div className="step-number">
+                        {index + 1}
+                      </div>
+                      <div className="step-content">
+                        <p className="step-narrative">
+                          {step.narrative.replace(/Go for[^.]*\.?\s*/gi, '')}
+                        </p>
+                        {typeof step.distance === 'number' && step.distance >= 0.05 && (
+                          <p className="step-distance">
+                            {step.distance < 1 
+                              ? `${Math.round(step.distance * 1000)} m` 
+                              : `${step.distance.toFixed(2)} km`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.div>

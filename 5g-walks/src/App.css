@@ -92,6 +92,8 @@
    ======================================== */
 
 .routes-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;

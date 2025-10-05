@@ -12,5 +12,27 @@ export default function ScrollToTop() {
     });
   }, [pathname]);
 
+  // Force scroll to top on page load/reload
+  useEffect(() => {
+    // Prevent browser from restoring scroll position
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    
+    // Scroll to top immediately
+    window.scrollTo(0, 0);
+    
+    // Also handle the load event to ensure it happens after full page load
+    const handleLoad = () => {
+      window.scrollTo(0, 0);
+    };
+    
+    window.addEventListener('load', handleLoad);
+    
+    return () => {
+      window.removeEventListener('load', handleLoad);
+    };
+  }, []);
+
   return null;
 }

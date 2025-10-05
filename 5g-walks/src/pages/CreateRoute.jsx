@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, Loader2, AlertCircle, MapPin, Clock, Footprints, Navigation } from 'lucide-react';
+import { Save, Loader2, AlertCircle, MapPin, Clock, Footprints, Navigation, Route as RouteIcon } from 'lucide-react';
 import RouteForm from '../components/RouteForm';
 import MapView from '../components/MapView';
 import { walkAPI, routesAPI } from '../lib/api';
@@ -70,19 +70,46 @@ export default function CreateRoute() {
 
   return (
     <div className="create-route-page">
-      <div className="create-container">
-        {/* Page Header */}
-        <motion.div
-          className="create-header"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="create-title">Create Your Walking Route</h1>
-          <p className="create-subtitle">
-            Design the perfect walking or running route. Set your starting point, destination, and we'll find the optimal path for you.
-          </p>
-        </motion.div>
+      {/* Grid Background with Glowing Lines */}
+      <div className="grid-background">
+        <div className="grid-pattern"></div>
+        {/* Horizontal glowing lines */}
+        <div className="glow-line glow-line-horizontal glow-line-1"></div>
+        <div className="glow-line glow-line-horizontal glow-line-2"></div>
+        <div className="glow-line glow-line-horizontal glow-line-3"></div>
+        {/* Vertical glowing lines */}
+        <div className="glow-line glow-line-vertical glow-line-4"></div>
+        <div className="glow-line glow-line-vertical glow-line-5"></div>
+        <div className="glow-line glow-line-vertical glow-line-6"></div>
+      </div>
+
+      {/* Hero Section */}
+      <section className="create-hero">
+        <div className="hero-background">
+          <div className="gradient-orb orb-1"></div>
+          <div className="gradient-orb orb-2"></div>
+        </div>
+
+        <div className="create-hero-container">
+          <motion.div
+            className="create-hero-content"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="create-hero-icon">
+              <RouteIcon size={48} />
+            </div>
+            <h1 className="create-hero-title">
+              <span className="title-white">Create Your</span> <span className="text-gradient">Walking Route</span>
+            </h1>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Main Content Section */}
+      <section className="create-section">
+        <div className="create-container">
 
         {/* Two Column Layout */}
         <div className="create-grid">
@@ -135,7 +162,7 @@ export default function CreateRoute() {
                     exit={{ opacity: 0 }}
                   >
                     <Loader2 className="spinner" size={48} />
-                    <h3>Generating Walking Route</h3>
+                    <h3>Generating Route</h3>
                     <p>Finding the optimal pedestrian path for your journey...</p>
                   </motion.div>
                 )}
@@ -151,222 +178,92 @@ export default function CreateRoute() {
                     transition={{ duration: 0.3 }}
                   >
                     <div className="preview-header">
-                      <h3>Route Preview</h3>
-                      <div className="route-stats">
-                        <div className="stat">
-                          <MapPin size={16} />
-                          <span>{routeData?.distance ? routeData.distance.toFixed(2) : '0.00'} km</span>
-                        </div>
-                        <div className="stat">
-                          <Clock size={16} />
-                          <span>{routeData?.duration ? Math.round(routeData.duration) : 0} min</span>
-                        </div>
-                        <div className="stat">
-                          <Footprints size={16} />
-                          <span>{routeData?.routeType || 'Walking'}</span>
-                        </div>
-                      </div>
+                      <h3><Navigation size={24} />Route Details</h3>
+                      <p className="preview-description">View your path on the interactive map below</p>
                     </div>
 
-                    {/* Route Locations Info */}
-                    {(routeData?.startLocation || routeData?.endLocation) && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.1 }}
-                        style={{
-                          padding: '1rem',
-                          background: '#f9fafb',
-                          borderRadius: '12px',
-                          marginBottom: '1rem',
-                          border: '1px solid #e5e7eb',
-                        }}
-                      >
-                        {routeData.startLocation && (
-                          <div style={{ marginBottom: '0.75rem' }}>
-                            <div style={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: '0.5rem',
-                              marginBottom: '0.25rem'
-                            }}>
-                              <div style={{
-                                width: '10px',
-                                height: '10px',
-                                borderRadius: '50%',
-                                background: '#22c55e',
-                              }} />
-                              <span style={{ 
-                                fontSize: '0.75rem', 
-                                fontWeight: 600, 
-                                color: '#6b7280',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em'
-                              }}>
-                                Start Point
-                              </span>
-                            </div>
-                            <p style={{ 
-                              margin: 0, 
-                              paddingLeft: '1.25rem',
-                              fontSize: '0.9rem',
-                              color: 'var(--jet-black)',
-                              fontWeight: 500,
-                            }}>
-                              {routeData.startLocation}
-                            </p>
-                          </div>
-                        )}
-                        {routeData.endLocation && (
-                          <div>
-                            <div style={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: '0.5rem',
-                              marginBottom: '0.25rem'
-                            }}>
-                              <div style={{
-                                width: '10px',
-                                height: '10px',
-                                borderRadius: '50%',
-                                background: '#ef4444',
-                              }} />
-                              <span style={{ 
-                                fontSize: '0.75rem', 
-                                fontWeight: 600, 
-                                color: '#6b7280',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em'
-                              }}>
-                                Destination
-                              </span>
-                            </div>
-                            <p style={{ 
-                              margin: 0, 
-                              paddingLeft: '1.25rem',
-                              fontSize: '0.9rem',
-                              color: 'var(--jet-black)',
-                              fontWeight: 500,
-                            }}>
-                              {routeData.endLocation}
-                            </p>
-                          </div>
-                        )}
-                      </motion.div>
-                    )}
+                    <div className="route-stats-preview">
+                      <div className="stat">
+                        <MapPin size={18} />
+                        <span>{routeData?.distance ? routeData.distance.toFixed(2) : '0.00'} km</span>
+                      </div>
+                      <div className="stat">
+                        <Clock size={18} />
+                        <span>{routeData?.duration ? Math.round(routeData.duration) : 0} min</span>
+                      </div>
+                      <div className="stat">
+                        <Footprints size={18} />
+                        <span>{routeData?.routeType || 'Walking'}</span>
+                      </div>
+                    </div>
 
                     <div className="map-container">
                       <MapView route={routeData} />
                     </div>
 
+                    {/* Route Locations Info - Below Map */}
+                    {(routeData?.startLocation || routeData?.endLocation) && (
+                      <div className="route-info-below-map">
+                        {routeData.startLocation && (
+                          <div className="location-info">
+                            <div className="location-label start">
+                              <MapPin size={18} />
+                              <span>Start Point</span>
+                            </div>
+                            <p className="location-text">
+                              {routeData.startLocation}
+                            </p>
+                          </div>
+                        )}
+                        {routeData.endLocation && (
+                          <div className="location-info">
+                            <div className="location-label destination">
+                              <MapPin size={18} />
+                              <span>Destination</span>
+                            </div>
+                            <p className="location-text">
+                              {routeData.endLocation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Turn-by-Turn Directions */}
                     {routeData?.steps && routeData.steps.length > 0 && (
                       <motion.div
-                        className="directions-section"
+                        className="directions-container"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.2 }}
-                        style={{
-                          marginTop: '2rem',
-                          padding: '1.5rem',
-                          background: 'white',
-                          borderRadius: '16px',
-                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-                        }}
                       >
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: '0.75rem', 
-                          marginBottom: '1.5rem',
-                          paddingBottom: '1rem',
-                          borderBottom: '2px solid #f3f4f6'
-                        }}>
-                          <Navigation size={24} style={{ color: 'var(--strava-orange)' }} />
-                          <h3 style={{ 
-                            fontSize: '1.25rem', 
-                            fontWeight: 700, 
-                            margin: 0,
-                            color: 'var(--jet-black)'
-                          }}>
-                            Turn-by-Turn Directions
-                          </h3>
+                        <div className="directions-header">
+                          <Navigation size={20} />
+                          <span>Turn-by-Turn Directions</span>
                         </div>
                         
-                        <div style={{ 
-                          maxHeight: '500px', 
-                          overflowY: 'auto',
-                          paddingRight: '0.5rem'
-                        }}>
+                        <div className="directions-list">
                           {routeData.steps.map((step, index) => (
-                            <motion.div
+                            <div 
                               key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.3, delay: index * 0.05 }}
-                              style={{
-                                display: 'flex',
-                                gap: '1rem',
-                                padding: '1rem',
-                                background: index % 2 === 0 ? '#f9fafb' : 'white',
-                                borderRadius: '12px',
-                                marginBottom: '0.75rem',
-                                border: '1px solid #e5e7eb',
-                                transition: 'all 0.2s ease',
-                              }}
-                              whileHover={{ 
-                                scale: 1.01,
-                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
-                              }}
+                              className="direction-step"
                             >
-                              <div style={{
-                                minWidth: '36px',
-                                height: '36px',
-                                borderRadius: '50%',
-                                background: 'linear-gradient(135deg, var(--strava-orange) 0%, #ff6b35 100%)',
-                                color: 'white',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontWeight: 700,
-                                fontSize: '0.875rem',
-                                boxShadow: '0 2px 8px rgba(252, 76, 2, 0.3)',
-                                flexShrink: 0,
-                              }}>
+                              <div className="step-number">
                                 {index + 1}
                               </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ 
-                                  margin: '0 0 0.5rem 0', 
-                                  fontSize: '0.95rem', 
-                                  lineHeight: '1.6',
-                                  color: 'var(--jet-black)',
-                                  fontWeight: 500,
-                                }}>
+                              <div className="step-content">
+                                <p className="step-narrative">
                                   {step.narrative.replace(/Go for[^.]*\.?\s*/gi, '')}
                                 </p>
-                                {typeof step.distance === 'number' && (
-                                  <div style={{ 
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.375rem',
-                                    padding: '0.25rem 0.75rem',
-                                    background: '#f3f4f6',
-                                    borderRadius: '6px',
-                                    fontSize: '0.875rem',
-                                    color: '#6b7280',
-                                    fontWeight: 600,
-                                  }}>
-                                    <MapPin size={14} />
-                                    {step.distance < 0.1 
-                                      ? '0.00 m'
-                                      : step.distance < 1 
-                                        ? `${Math.round(step.distance * 1000)} m` 
-                                        : `${step.distance.toFixed(2)} km`}
-                                  </div>
+                                {typeof step.distance === 'number' && step.distance >= 0.05 && (
+                                  <p className="step-distance">
+                                    {step.distance < 1 
+                                      ? `${Math.round(step.distance * 1000)} m` 
+                                      : `${step.distance.toFixed(2)} km`}
+                                  </p>
                                 )}
                               </div>
-                            </motion.div>
+                            </div>
                           ))}
                         </div>
                       </motion.div>
@@ -405,7 +302,8 @@ export default function CreateRoute() {
             </div>
           </motion.div>
         </div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

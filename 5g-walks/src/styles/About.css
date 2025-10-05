@@ -220,7 +220,7 @@
   text-align: center !important;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 3rem;
+  margin-bottom: 7rem !important;
   letter-spacing: -0.02em;
   width: 100%;
 }
@@ -337,11 +337,12 @@
 }
 
 /* ========================================
-   TEAM SECTION
+   TEAM SECTION - VALORANT STYLE
    ======================================== */
 
 .team-section {
   background: rgba(250, 250, 250, 0.7);
+  padding-top: 8rem !important;
 }
 
 .team-grid {
@@ -352,52 +353,284 @@
   margin: 0 auto;
 }
 
-.team-card {
-  background: #ffffff;
-  border: 1px solid rgba(13, 13, 13, 0.08);
+/* Card Wrapper */
+.team-card-wrapper {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  perspective: 1000px;
+  overflow: visible;
+}
+
+/* Card Front (Hidden State) */
+.team-card-front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    rgba(26, 26, 26, 0.95) 0%, 
+    rgba(42, 42, 42, 0.95) 100%
+  );
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--strava-orange);
   border-radius: 16px;
-  padding: 1.75rem 1.5rem;
-  text-align: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-}
-
-.team-card:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-  border-color: var(--strava-orange);
-}
-
-.team-avatar {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 1.25rem;
+  padding: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--strava-orange), #ff6b35);
+  cursor: pointer;
+  overflow: hidden;
+  box-sizing: border-box;
+  box-shadow: 
+    0 0 20px rgba(252, 76, 2, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 0 60px rgba(252, 76, 2, 0.1);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.team-card-front:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 0 30px rgba(252, 76, 2, 0.5),
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    inset 0 0 80px rgba(252, 76, 2, 0.15);
+  border-color: #ff6b35;
+}
+
+/* Glass overlay effect */
+.glass-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.card-front-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+.mystery-icon {
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--pure-white);
+  text-shadow: 
+    0 0 10px rgba(252, 76, 2, 1),
+    0 0 20px rgba(252, 76, 2, 0.8),
+    0 0 30px rgba(252, 76, 2, 0.6),
+    0 0 40px rgba(252, 76, 2, 0.4),
+    0 0 50px rgba(252, 76, 2, 0.2);
+  margin-bottom: 1rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.initials-circle {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
+  background: rgba(252, 76, 2, 0.2);
+  border: 3px solid var(--strava-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--pure-white);
+  text-shadow: 
+    0 0 10px rgba(252, 76, 2, 1),
+    0 0 20px rgba(252, 76, 2, 0.8),
+    0 0 30px rgba(252, 76, 2, 0.6);
+  margin-bottom: 1rem;
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 
+    0 0 20px rgba(252, 76, 2, 0.4),
+    0 0 40px rgba(252, 76, 2, 0.2),
+    inset 0 0 20px rgba(252, 76, 2, 0.1);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.mystery-text {
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--pure-white);
-  box-shadow: 0 8px 24px rgba(252, 76, 2, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.team-card-front:hover .mystery-text {
+  opacity: 1;
+}
+
+/* Mouse-following shine effect */
+.card-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 16px;
+}
+
+.team-card-front:hover .card-shine {
+  opacity: 1;
+}
+
+.card-front-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Card Back (Revealed State) */
+.team-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  border: 2px solid var(--strava-orange);
+  border-radius: 16px;
+  padding: 0;
+  text-align: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  box-shadow: 
+    0 0 20px rgba(252, 76, 2, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.team-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 0 30px rgba(252, 76, 2, 0.3),
+    0 12px 48px rgba(0, 0, 0, 0.12);
+}
+
+/* Reveal particles effect */
+.reveal-particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--strava-orange);
+  border-radius: 50%;
+  box-shadow: 
+    0 0 10px rgba(252, 76, 2, 0.8),
+    0 0 20px rgba(252, 76, 2, 0.5);
+}
+
+.team-avatar {
+  display: none;
+}
+
+/* Floating avatar that appears behind the card on hover */
+.floating-avatar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 180px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  transition: filter 0.4s ease 0.3s;
+}
+
+.floating-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+  position: relative;
+}
+
+/* Orange glow effect when fully visible */
+.revealed-card:hover .floating-avatar {
+  filter: drop-shadow(0 0 20px rgba(252, 76, 2, 0.4)) 
+         drop-shadow(0 0 40px rgba(252, 76, 2, 0.2))
+         drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+}
+
+/* Revealed card styling */
+.revealed-card {
+  position: relative;
+  overflow: visible !important;
+}
+
+.revealed-card:hover {
+  overflow: visible !important;
 }
 
 .team-name {
   font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--jet-black);
-  margin-bottom: 0.5rem;
+  color: var(--pure-white);
+  background: var(--strava-orange);
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  display: inline-block;
+  box-shadow: 0 4px 16px rgba(252, 76, 2, 0.3);
+  margin-top: calc(50% - 2rem);
+  margin-bottom: 0;
+  flex-shrink: 0;
 }
 
 .team-role {
-  font-size: 0.95rem;
-  color: var(--strava-orange);
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  display: none;
 }
 
 .team-description {
@@ -405,59 +638,72 @@
   line-height: 1.6;
   color: rgba(13, 13, 13, 0.7);
   margin: 0;
+  padding: 1.5rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  box-sizing: border-box;
 }
 
 /* ========================================
    CTA SECTION
    ======================================== */
 
-.cta-section {
-  background: linear-gradient(135deg, var(--jet-black) 0%, #1a1a1a 100%);
-  text-align: center;
-  padding: 6rem 0;
+.about-page .cta-section {
+  background: var(--jet-black);
+  padding: 5rem 0;
 }
 
-.cta-content {
-  max-width: 700px;
+.about-page .cta-content {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, rgba(252, 76, 2, 0.1), rgba(255, 107, 53, 0.05));
+  border-radius: var(--radius-xl);
+  border: 2px solid rgba(252, 76, 2, 0.2);
+  max-width: 900px;
   margin: 0 auto;
 }
 
-.cta-title {
+.about-page .cta-title {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 900;
   color: var(--pure-white);
   margin-bottom: 1rem;
-  letter-spacing: -0.02em;
 }
 
-.cta-text {
-  font-size: 1.25rem;
+.about-page .cta-text {
+  font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 2.5rem;
-  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, var(--strava-orange), #ff6b35);
+.about-page .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 3rem;
+  background: var(--strava-orange);
   color: var(--pure-white);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-family: var(--font-display);
   font-weight: 700;
+  font-size: 1.2rem;
   cursor: pointer;
-  box-shadow: 0 8px 32px rgba(252, 76, 2, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px rgba(252, 76, 2, 0.5);
+  transition: all var(--timing-base) var(--ease-smooth);
 }
 
-.btn-large {
-  padding: 1.25rem 3rem;
-  font-size: 1.1rem;
-}
-
-.btn-primary:hover {
-  box-shadow: 0 12px 40px rgba(252, 76, 2, 0.6);
-  transform: translateY(-2px);
+.about-page .btn-primary:hover {
+  background: #e63f00;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 48px rgba(252, 76, 2, 0.7);
 }
 
 /* ========================================
