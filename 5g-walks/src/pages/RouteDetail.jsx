@@ -415,11 +415,15 @@ export default function RouteDetail() {
                         </div>
                         <div style={{ flex: 1 }}>
                           <p style={{ margin: '0 0 0.25rem 0', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                            {step.narrative}
+                            {step.narrative.replace(/Go for[^.]*\.?\s*/gi, '')}
                           </p>
-                          {step.distance && (
+                          {typeof step.distance === 'number' && (
                             <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-                              {step.distance.toFixed(2)} km
+                              {step.distance < 0.1 
+                                ? '0.00 m'
+                                : step.distance < 1 
+                                  ? `${Math.round(step.distance * 1000)} m` 
+                                  : `${step.distance.toFixed(2)} km`}
                             </p>
                           )}
                         </div>

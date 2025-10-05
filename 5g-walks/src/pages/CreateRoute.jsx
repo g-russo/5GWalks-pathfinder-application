@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, Loader2, AlertCircle, MapPin, Clock, Footprints } from 'lucide-react';
+import { Save, Loader2, AlertCircle, MapPin, Clock, Footprints, Navigation } from 'lucide-react';
 import RouteForm from '../components/RouteForm';
 import MapView from '../components/MapView';
 import { walkAPI, routesAPI } from '../lib/api';
@@ -161,18 +161,223 @@ export default function CreateRoute() {
                           <Clock size={16} />
                           <span>{routeData?.duration ? Math.round(routeData.duration) : 0} min</span>
                         </div>
+                        <div className="stat">
+                          <Footprints size={16} />
+                          <span>{routeData?.routeType || 'Walking'}</span>
+                        </div>
                       </div>
                     </div>
+
+                    {/* Route Locations Info */}
+                    {(routeData?.startLocation || routeData?.endLocation) && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.1 }}
+                        style={{
+                          padding: '1rem',
+                          background: '#f9fafb',
+                          borderRadius: '12px',
+                          marginBottom: '1rem',
+                          border: '1px solid #e5e7eb',
+                        }}
+                      >
+                        {routeData.startLocation && (
+                          <div style={{ marginBottom: '0.75rem' }}>
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '0.5rem',
+                              marginBottom: '0.25rem'
+                            }}>
+                              <div style={{
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                background: '#22c55e',
+                              }} />
+                              <span style={{ 
+                                fontSize: '0.75rem', 
+                                fontWeight: 600, 
+                                color: '#6b7280',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
+                              }}>
+                                Start Point
+                              </span>
+                            </div>
+                            <p style={{ 
+                              margin: 0, 
+                              paddingLeft: '1.25rem',
+                              fontSize: '0.9rem',
+                              color: 'var(--jet-black)',
+                              fontWeight: 500,
+                            }}>
+                              {routeData.startLocation}
+                            </p>
+                          </div>
+                        )}
+                        {routeData.endLocation && (
+                          <div>
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: '0.5rem',
+                              marginBottom: '0.25rem'
+                            }}>
+                              <div style={{
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                background: '#ef4444',
+                              }} />
+                              <span style={{ 
+                                fontSize: '0.75rem', 
+                                fontWeight: 600, 
+                                color: '#6b7280',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
+                              }}>
+                                Destination
+                              </span>
+                            </div>
+                            <p style={{ 
+                              margin: 0, 
+                              paddingLeft: '1.25rem',
+                              fontSize: '0.9rem',
+                              color: 'var(--jet-black)',
+                              fontWeight: 500,
+                            }}>
+                              {routeData.endLocation}
+                            </p>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
 
                     <div className="map-container">
                       <MapView route={routeData} />
                     </div>
+
+                    {/* Turn-by-Turn Directions */}
+                    {routeData?.steps && routeData.steps.length > 0 && (
+                      <motion.div
+                        className="directions-section"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.2 }}
+                        style={{
+                          marginTop: '2rem',
+                          padding: '1.5rem',
+                          background: 'white',
+                          borderRadius: '16px',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+                        }}
+                      >
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '0.75rem', 
+                          marginBottom: '1.5rem',
+                          paddingBottom: '1rem',
+                          borderBottom: '2px solid #f3f4f6'
+                        }}>
+                          <Navigation size={24} style={{ color: 'var(--strava-orange)' }} />
+                          <h3 style={{ 
+                            fontSize: '1.25rem', 
+                            fontWeight: 700, 
+                            margin: 0,
+                            color: 'var(--jet-black)'
+                          }}>
+                            Turn-by-Turn Directions
+                          </h3>
+                        </div>
+                        
+                        <div style={{ 
+                          maxHeight: '500px', 
+                          overflowY: 'auto',
+                          paddingRight: '0.5rem'
+                        }}>
+                          {routeData.steps.map((step, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.3, delay: index * 0.05 }}
+                              style={{
+                                display: 'flex',
+                                gap: '1rem',
+                                padding: '1rem',
+                                background: index % 2 === 0 ? '#f9fafb' : 'white',
+                                borderRadius: '12px',
+                                marginBottom: '0.75rem',
+                                border: '1px solid #e5e7eb',
+                                transition: 'all 0.2s ease',
+                              }}
+                              whileHover={{ 
+                                scale: 1.01,
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
+                              }}
+                            >
+                              <div style={{
+                                minWidth: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, var(--strava-orange) 0%, #ff6b35 100%)',
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 700,
+                                fontSize: '0.875rem',
+                                boxShadow: '0 2px 8px rgba(252, 76, 2, 0.3)',
+                                flexShrink: 0,
+                              }}>
+                                {index + 1}
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ 
+                                  margin: '0 0 0.5rem 0', 
+                                  fontSize: '0.95rem', 
+                                  lineHeight: '1.6',
+                                  color: 'var(--jet-black)',
+                                  fontWeight: 500,
+                                }}>
+                                  {step.narrative.replace(/Go for[^.]*\.?\s*/gi, '')}
+                                </p>
+                                {typeof step.distance === 'number' && (
+                                  <div style={{ 
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.375rem',
+                                    padding: '0.25rem 0.75rem',
+                                    background: '#f3f4f6',
+                                    borderRadius: '6px',
+                                    fontSize: '0.875rem',
+                                    color: '#6b7280',
+                                    fontWeight: 600,
+                                  }}>
+                                    <MapPin size={14} />
+                                    {step.distance < 0.1 
+                                      ? '0.00 m'
+                                      : step.distance < 1 
+                                        ? `${Math.round(step.distance * 1000)} m` 
+                                        : `${step.distance.toFixed(2)} km`}
+                                  </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
 
                     <motion.button
                       className="btn-save-route"
                       onClick={handleSaveRoute}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
+                      style={{ marginTop: '1.5rem' }}
                     >
                       <Save size={18} />
                       <span>Save This Route</span>
