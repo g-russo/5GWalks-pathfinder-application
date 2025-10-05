@@ -8,9 +8,8 @@ export default function Footer() {
 
   const quickLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Create Route', path: '/create' },
-    { name: 'Saved Routes', path: '/saved' },
-    { name: 'Community', path: '/shared' }
+    { name: 'My Routes', path: '/saved' },
+    { name: 'About Us', path: '/about' }
   ];
 
   const socialLinks = [
@@ -86,7 +85,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="footer-bottom">
           <p className="copyright">
-            © {currentYear} 5G Walks. Crafted with passion.
+            © {currentYear} 5G Walks. Crafted by The 5G Talks Podcast.
           </p>
           <div className="footer-links-inline">
             <a href="#" className="footer-link-small">Privacy</a>

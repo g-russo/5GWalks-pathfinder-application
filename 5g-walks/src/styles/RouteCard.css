@@ -8,6 +8,9 @@
   cursor: pointer;
   border: 2px solid rgba(13, 13, 13, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 450px; /* Fixed height for consistency */
+  display: flex;
+  flex-direction: column;
 }
 
 .route-card:hover {
@@ -35,6 +38,7 @@
   border-radius: 10px;
   overflow: hidden;
   background: #f5f5f5;
+  flex-shrink: 0; /* Prevent image from shrinking */
 }
 
 .card-image {
@@ -52,7 +56,9 @@
 .card-header {
   position: relative;
   z-index: 1;
-  min-height: 140px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding-bottom: 60px;
 }
 
@@ -64,6 +70,12 @@
   margin-bottom: 12px;
   line-height: 1.3;
   letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .card-description {
@@ -71,6 +83,12 @@
   color: rgba(13, 13, 13, 0.6);
   line-height: 1.6;
   margin-bottom: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limit to 3 lines */
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 /* View button with text - appears on card hover */
@@ -109,6 +127,7 @@
 @media (max-width: 768px) {
   .route-card {
     padding: 18px;
+    height: 420px; /* Consistent height for tablets */
   }
 
   .card-title {
@@ -125,7 +144,6 @@
   }
 
   .card-header {
-    min-height: 120px;
     padding-bottom: 55px;
   }
 
@@ -140,6 +158,7 @@
 @media (max-width: 480px) {
   .route-card {
     padding: 16px;
+    height: 390px; /* Consistent height for mobile */
   }
 
   .card-image-container {
@@ -152,7 +171,6 @@
   }
 
   .card-header {
-    min-height: 110px;
     padding-bottom: 50px;
   }
 
