@@ -40,3 +40,96 @@
 .read-the-docs {
   color: #888;
 }
+
+/* App-specific styles for 5G Walks */
+.app-wrapper {
+  max-width: 980px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.card.app-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), #fff);
+  color: #111;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.5);
+}
+.app-main {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.app-form {
+  flex: 1 1 420px;
+}
+
+.app-map {
+  width: 420px;
+  min-height: 360px;
+  flex: 0 0 420px;
+}
+
+.app-map > div { min-height: 360px; }
+
+.leaflet-container { border-radius: 8px; }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.75rem;
+  letter-spacing: 0.6px;
+}
+
+.route-form { text-align: left; margin-top: 16px; }
+.form-row { margin-bottom: 12px; position: relative; }
+.form-row label { display: block; font-weight: 600; margin-bottom: 6px; }
+.text-input {
+  width: 100%;
+  max-width: 720px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #dfe6f3;
+  background: #fafbff;
+  box-sizing: border-box;
+}
+
+.controls { display:flex; gap: 8px; align-items:center; margin-top:8px; }
+.btn { padding: 10px 14px; border-radius: 8px; border: none; cursor: pointer; }
+.btn-primary { background: linear-gradient(90deg,#4f46e5,#646cff); color: #fff; }
+.btn-secondary { background: #eef2ff; color: #1f2937; border: 1px solid #dfe6f3; }
+
+.suggestions {
+  position: absolute;
+  z-index: 60;
+  left: 0;
+  right: auto;
+  top: 100%;
+  background: #fff;
+  border: 1px solid #e6eefc;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.12);
+  border-radius: 8px;
+  margin-top: 6px;
+  max-height: 240px;
+  overflow: auto;
+  width: calc(100% - 2px);
+}
+.suggestion-item { padding: 10px 12px; cursor: pointer; color: #0f1724; }
+.suggestion-item:hover { background: #f1f5ff; }
+
+.route-map { width: 100%; height: auto; border-radius: 8px; border: 1px solid #e6eefc; }
+.summary-table { width: 100%; max-width: 720px; margin-top: 10px; border-collapse: collapse; }
+.summary-table td { padding:8px 10px; border: 1px solid #eef2ff; }
+
+@media (max-width: 720px) {
+  .app-wrapper { padding: 12px; }
+  .text-input { max-width: 100%; }
+  .summary-table, .route-map { max-width: 100%; }
+}
