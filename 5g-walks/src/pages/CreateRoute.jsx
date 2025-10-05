@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, Loader2, AlertCircle, MapPin, Clock } from 'lucide-react';
+import { Save, Loader2, AlertCircle, MapPin, Clock, Footprints } from 'lucide-react';
 import RouteForm from '../components/RouteForm';
 import MapView from '../components/MapView';
-import { mapQuestAPI, routesAPI } from '../lib/api';
+import { walkAPI, routesAPI } from '../lib/api';
 import '../styles/CreateRoute.css';
 
 export default function CreateRoute() {
@@ -19,27 +19,38 @@ export default function CreateRoute() {
     setError(null);
 
     try {
-      // Get directions from MapQuest
-      const directions = await mapQuestAPI.getDirections(
+      // Create walking route using the backend /walk endpoint
+      const walkResponse = await walkAPI.createWalkRoute(
         formData.startLocation,
         formData.endLocation,
-        { routeType: formData.routeType }
+        formData.routeType,
+        'metric' // Using metric system (kilometers)
       );
 
+      // Check if the API call was successful
+      if (!walkResponse.success) {
+        throw new Error('Failed to generate walking route');
+      }
+
       // Extract route information
-      const route = directions.route;
       const newRouteData = {
         ...formData,
-        distance: route.distance,
-        duration: route.time / 60, // Convert to minutes
-        shape: route.shape,
-        legs: route.legs,
+        distance: walkResponse.distance || 0,
+        duration: walkResponse.time_seconds ? walkResponse.time_seconds / 60 : 0, // Convert to minutes
+        formattedTime: walkResponse.formatted_time || 'N/A',
+        shape: walkResponse.shape || [],
+        steps: walkResponse.steps || [],
+        locations: walkResponse.locations || [],
+        staticMapUrl: walkResponse.static_map_url,
+        directionsLink: walkResponse.directions_link,
+        units: walkResponse.units || 'km',
       };
 
+      console.log('Route data received:', newRouteData); // Debug log
       setRouteData(newRouteData);
     } catch (err) {
-      console.error('Error generating route:', err);
-      setError('Failed to generate route. Please check your locations and try again.');
+      console.error('Error generating walking route:', err);
+      setError(err.response?.data?.detail || 'Failed to generate walking route. Please check your locations and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -67,9 +78,9 @@ export default function CreateRoute() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="create-title">Create Your Route</h1>
+          <h1 className="create-title">Create Your Walking Route</h1>
           <p className="create-subtitle">
-            Design the perfect walking route. Set your starting point, destination, and let us handle the rest.
+            Design the perfect walking or running route. Set your starting point, destination, and we'll find the optimal path for you.
           </p>
         </motion.div>
 
@@ -124,8 +135,8 @@ export default function CreateRoute() {
                     exit={{ opacity: 0 }}
                   >
                     <Loader2 className="spinner" size={48} />
-                    <h3>Generating Route</h3>
-                    <p>Finding the best path for your journey...</p>
+                    <h3>Generating Walking Route</h3>
+                    <p>Finding the optimal pedestrian path for your journey...</p>
                   </motion.div>
                 )}
 
@@ -144,11 +155,11 @@ export default function CreateRoute() {
                       <div className="route-stats">
                         <div className="stat">
                           <MapPin size={16} />
-                          <span>{routeData.distance.toFixed(2)} km</span>
+                          <span>{routeData?.distance ? routeData.distance.toFixed(2) : '0.00'} km</span>
                         </div>
                         <div className="stat">
                           <Clock size={16} />
-                          <span>{Math.round(routeData.duration)} min</span>
+                          <span>{routeData?.duration ? Math.round(routeData.duration) : 0} min</span>
                         </div>
                       </div>
                     </div>
@@ -179,10 +190,10 @@ export default function CreateRoute() {
                     exit={{ opacity: 0 }}
                   >
                     <div className="empty-icon">
-                      <MapPin size={48} />
+                      <Footprints size={48} />
                     </div>
-                    <h3>Your Route Will Appear Here</h3>
-                    <p>Fill in the form to generate your walking route and see it come to life on the map.</p>
+                    <h3>Your Walking Route Will Appear Here</h3>
+                    <p>Fill in the form to generate your optimal walking or running route and see it visualized on the map.</p>
                   </motion.div>
                 )}
               </AnimatePresence>

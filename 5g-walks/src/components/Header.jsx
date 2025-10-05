@@ -161,14 +161,14 @@ export default function Header() {
         </AnimatePresence>
 
         {/* Create Button - always visible */}
-        <Link to="/create" onClick={() => !isAtTop && setIsMenuOpen(false)}>
+        <Link to="/walk" onClick={() => !isAtTop && setIsMenuOpen(false)}>
           <motion.button
             className="btn-create"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <Plus size={18} />
-            <span>Create</span>
+            <span>Start Now</span>
           </motion.button>
         </Link>
       </motion.div>

@@ -1,79 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import MotionPathHero from '../components/MotionPathHero';
 import RouteCard from '../components/RouteCard';
+import { FEATURED_ROUTES, preGenerateAllRoutes } from '../constants/featuredRoutes';
+import { walkAPI } from '../lib/api';
 import '../styles/Home.css';
 
 export default function Home() {
   const navigate = useNavigate();
+  const [isPreGenerating, setIsPreGenerating] = useState(false);
 
-  // Featured routes in Metro Manila
-  const featuredRoutes = [
-    {
-      id: 1,
-      name: 'BGC Skyline Walk',
-      description: 'Modern cityscape route through Bonifacio Global City with stunning high-rise views',
-      distance: 5.2,
-      duration: 65,
-      type: 'Walking',
-      // IMAGE: Place your BGC Skyline Walk image at /public/featured-routes/bgc-skyline-walk.jpg
-      image: '/featured-routes/bgc-skyline-walk.jpg',
-    },
-    {
-      id: 2,
-      name: 'Rizal Park Heritage Trail',
-      description: 'Historic walk through Luneta featuring monuments and lush gardens',
-      distance: 3.8,
-      duration: 50,
-      type: 'Walking',
-      // IMAGE: Place your Rizal Park Heritage Trail image at /public/featured-routes/rizal-park-heritage-trail.jpg
-      image: '/featured-routes/rizal-park-heritage-trail.jpg',
-    },
-    {
-      id: 3,
-      name: 'Ayala Triangle Gardens Loop',
-      description: 'Peaceful urban oasis in the heart of Makati business district',
-      distance: 2.5,
-      duration: 35,
-      type: 'Walking',
-      // IMAGE: Place your Ayala Triangle Gardens Loop image at /public/featured-routes/ayala-triangle-gardens-loop.jpg
-      image: '/featured-routes/ayala-triangle-gardens-loop.jpg',
-    },
-    {
-      id: 4,
-      name: 'Manila Bay Sunset Promenade',
-      description: 'Scenic waterfront walk along Roxas Boulevard with bay views',
-      distance: 4.5,
-      duration: 55,
-      type: 'Walking',
-      // IMAGE: Place your Manila Bay Sunset Promenade image at /public/featured-routes/manila-bay-sunset-promenade.jpg
-      image: '/featured-routes/manila-bay-sunset-promenade.jpg',
-    },
-    {
-      id: 5,
-      name: 'UP Diliman Academic Oval',
-      description: 'Tree-lined university route perfect for morning walks and exercise',
-      distance: 2.2,
-      duration: 30,
-      type: 'Walking',
-      // IMAGE: Place your UP Diliman Academic Oval image at /public/featured-routes/up-diliman-academic-oval.jpg
-      image: '/featured-routes/up-diliman-academic-oval.jpg',
-    },
-    {
-      id: 6,
-      name: 'Intramuros Walled City Tour',
-      description: 'Colonial-era fortified city with cobblestone streets and Spanish architecture',
-      distance: 3.5,
-      duration: 45,
-      type: 'Walking',
-      // IMAGE: Place your Intramuros Walled City Tour image at /public/featured-routes/intramuros-walled-city-tour.jpg
-      image: '/featured-routes/intramuros-walled-city-tour.jpg',
-    },
-  ];
+  // Pre-generate all featured routes on component mount
+  useEffect(() => {
+    const preGenerate = async () => {
+      setIsPreGenerating(true);
+      try {
+        await preGenerateAllRoutes(async (start, end, type, units) => {
+          const response = await walkAPI.createWalkRoute(start, end, type, units);
+          if (!response.success) {
+            throw new Error('Failed to generate route');
+          }
+          return response;
+        });
+      } catch (error) {
+        console.error('Error pre-generating routes:', error);
+      } finally {
+        setIsPreGenerating(false);
+      }
+    };
+
+    // Pre-generate routes in the background
+    preGenerate();
+  }, []);
 
   const handleViewRoute = (routeId) => {
+    // Navigate directly to the route detail page
     navigate(`/route/${routeId}`);
   };
 
@@ -118,11 +81,11 @@ export default function Home() {
             <div className="hero-actions">
               <motion.button
                 className="btn-primary btn-large"
-                onClick={() => navigate('/create')}
+                onClick={() => navigate('/walk')}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Create a Route
+                Start Walking Now
                 <ArrowRight size={20} />
               </motion.button>
 
@@ -163,11 +126,22 @@ export default function Home() {
             </h2>
             <p className="section-subtitle">
               Explore the best walking routes around Metro Manila
+              {isPreGenerating && (
+                <span style={{ 
+                  display: 'inline-block', 
+                  marginLeft: '0.5rem', 
+                  color: 'var(--strava-orange)',
+                  fontSize: '0.875rem',
+                  fontWeight: 600
+                }}>
+                  🗺️ Pre-loading routes for instant viewing...
+                </span>
+              )}
             </p>
           </motion.div>
 
           <div className="routes-grid">
-            {featuredRoutes.map((route, index) => (
+            {FEATURED_ROUTES.map((route, index) => (
               <motion.div
                 key={route.id}
                 initial={{ opacity: 0, y: 30 }}
