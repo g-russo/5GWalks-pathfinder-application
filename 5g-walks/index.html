@@ -5,6 +5,12 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>5g-walks</title>
+    <!-- Leaflet CSS and JS for interactive maps (used by the frontend).
+      Removed SRI/integrity and crossorigin attributes to avoid browsers blocking
+      the resources if hashes don't match. Consider installing `leaflet` via
+      npm and importing its CSS in your frontend code for a more robust setup. -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   </head>
   <body>
     <div id="root"></div>
