@@ -21,31 +21,31 @@ export default function About() {
       name: 'Cairos Magno',
       role: 'Team Member',
       description: 'Passionate walker and tech enthusiast dedicated to connecting people through movement.',
-      // photo: '/team/cairos-magno.jpg', // Add Cairos Magno's photo here
+      photo: '/card-photos/cai.png',
     },
     {
       name: 'Curt Reyes',
       role: 'Team Member',
       description: 'Full-stack developer bringing innovative solutions to the walking community.',
-      // photo: '/team/curt-reyes.jpg', // Add Curt Reyes's photo here
+      photo: '/card-photos/curt.png',
     },
     {
       name: 'Ian Sideño',
       role: 'Team Member',
       description: 'Building and nurturing our global community of walking enthusiasts.',
-      // photo: '/team/ian-sideno.jpg', // Add Ian Sideño's photo here
+      photo: '/card-photos/ian.png',
     },
     {
       name: 'Russ Garcia',
       role: 'Team Member',
       description: 'Crafting beautiful and intuitive experiences for every walker.',
-      // photo: '/team/russ-garcia.jpg', // Add Russ Garcia's photo here
+      photo: '/card-photos/russ.png',
     },
     {
       name: 'Troy Gonzales',
       role: 'Team Member',
       description: 'Dedicated to creating seamless user experiences for all walkers.',
-      // photo: '/team/troy-gonzales.jpg', // Add Troy Gonzales's photo here
+      photo: '/card-photos/troy.png',
     },
   ];
 
