@@ -622,11 +622,19 @@
   background: var(--strava-orange);
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
-  display: inline-block;
+  display: block;
+  width: 90%;
+  max-width: 200px;
+  text-align: center;
   box-shadow: 0 4px 16px rgba(252, 76, 2, 0.3);
   margin-top: calc(50% - 2rem);
+  margin-left: auto;
+  margin-right: auto;
   margin-bottom: 0;
   flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .team-role {

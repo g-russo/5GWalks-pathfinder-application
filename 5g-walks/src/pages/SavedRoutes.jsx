@@ -1,112 +1,196 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import RouteCard from '../components/RouteCard';
-import { routesAPI } from '../lib/api';
+import { motion } from 'motion/react';
+import { Construction, Hammer, AlertTriangle } from 'lucide-react';
 
 export default function SavedRoutes() {
-  const navigate = useNavigate();
-  const [routes, setRoutes] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    loadSavedRoutes();
-  }, []);
-
-  const loadSavedRoutes = async () => {
-    try {
-      const response = await routesAPI.getSavedRoutes();
-      setRoutes(response.data);
-    } catch (err) {
-      console.error('Error loading saved routes:', err);
-      setError('Failed to load saved routes');
-      // Mock data for development
-      setRoutes([
-        {
-          id: 1,
-          name: 'Morning Jog Route',
-          description: 'My favorite morning running path',
-          distance: 6.5,
-          duration: 75,
-          type: 'Walking',
-        },
-        {
-          id: 2,
-          name: 'Evening Stroll',
-          description: 'Relaxing evening walk around the neighborhood',
-          distance: 2.8,
-          duration: 35,
-          type: 'Walking',
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleViewRoute = (routeId) => {
-    navigate(`/route/${routeId}`);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="loading">
-        <p>Loading your routes...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-state" style={{ textAlign: 'center', padding: '4rem 1.5rem' }}>
-        <h3>{error}</h3>
-        <p>Please try again later</p>
-      </div>
-    );
-  }
-
   return (
-    <motion.div
-      className="saved-routes-container"
-      style={{ maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem' }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="page-header" style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>
-          My Saved Routes
-        </h1>
-        <p style={{ color: 'hsl(var(--muted-foreground))', fontSize: '1.125rem', margin: 0 }}>
-          Your collection of favorite walking routes
-        </p>
-      </div>
+    <div style={{ 
+      minHeight: '80vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      padding: '8rem 2rem 2rem',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Grid Background */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundImage: 'linear-gradient(rgba(252, 76, 2, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(252, 76, 2, 0.05) 1px, transparent 1px)',
+        backgroundSize: '50px 50px',
+        zIndex: 0
+      }} />
 
-      {routes.length === 0 ? (
-        <div className="empty-state">
-          <h3>No saved routes yet</h3>
-          <p>Start by creating your first route or save routes from the community</p>
-        </div>
-      ) : (
-        <div className="routes-grid" style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: '2rem',
-          justifyItems: 'center',
-        }}>
-          {routes.map((route, index) => (
-            <motion.div
-              key={route.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <RouteCard route={route} onView={handleViewRoute} />
-            </motion.div>
-          ))}
-        </div>
-      )}
-    </motion.div>
+      <motion.div
+        style={{
+          textAlign: 'center',
+          maxWidth: '600px',
+          position: 'relative',
+          zIndex: 1,
+          background: 'white',
+          padding: '3rem 2rem',
+          borderRadius: '20px',
+          border: '2px solid rgba(252, 76, 2, 0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
+        }}
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
+        {/* Animated Icons */}
+        <motion.div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '1rem',
+            marginBottom: '2rem'
+          }}
+        >
+          <motion.div
+            animate={{ 
+              rotate: [0, -10, 10, -10, 0],
+              y: [0, -5, 0]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 1
+            }}
+          >
+            <Construction size={48} color="#FC4C02" strokeWidth={2} />
+          </motion.div>
+          <motion.div
+            animate={{ 
+              rotate: [0, 15, -15, 15, 0],
+              y: [0, -8, 0]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 1,
+              delay: 0.3
+            }}
+          >
+            <Hammer size={48} color="#FC4C02" strokeWidth={2} />
+          </motion.div>
+          <motion.div
+            animate={{ 
+              scale: [1, 1.1, 1],
+              y: [0, -5, 0]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 1,
+              delay: 0.6
+            }}
+          >
+            <AlertTriangle size={48} color="#FFA500" strokeWidth={2} />
+          </motion.div>
+        </motion.div>
+
+        {/* Main Title */}
+        <motion.h1
+          style={{
+            fontSize: '2.5rem',
+            fontWeight: 700,
+            color: '#1a1a1a',
+            marginBottom: '1rem',
+            lineHeight: 1.2
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          Page Under Construction
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          style={{
+            fontSize: '1.125rem',
+            color: '#666',
+            marginBottom: '2rem',
+            lineHeight: 1.6
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          We're working hard to bring you the <strong style={{ color: '#FC4C02' }}>My Routes</strong> feature. 
+          This page will allow you to save, organize, and manage all your favorite walking routes.
+        </motion.p>
+
+        {/* Feature List */}
+        <motion.div
+          style={{
+            textAlign: 'left',
+            background: 'rgba(252, 76, 2, 0.05)',
+            padding: '1.5rem',
+            borderRadius: '12px',
+            marginBottom: '2rem'
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <h3 style={{ 
+            fontSize: '1rem', 
+            fontWeight: 600, 
+            color: '#FC4C02',
+            marginBottom: '1rem'
+          }}>
+            Coming Soon:
+          </h3>
+          <ul style={{ 
+            listStyle: 'none', 
+            padding: 0, 
+            margin: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem'
+          }}>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#666' }}>
+              <span style={{ color: '#FC4C02' }}>✓</span> Save your favorite routes
+            </li>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#666' }}>
+              <span style={{ color: '#FC4C02' }}>✓</span> Organize routes by category
+            </li>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#666' }}>
+              <span style={{ color: '#FC4C02' }}>✓</span> Track your walking history
+            </li>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#666' }}>
+              <span style={{ color: '#FC4C02' }}>✓</span> Share routes with friends
+            </li>
+          </ul>
+        </motion.div>
+
+        {/* Back Button */}
+        <motion.button
+          style={{
+            background: 'linear-gradient(135deg, #FC4C02, #ff6b35)',
+            color: 'white',
+            border: 'none',
+            padding: '0.875rem 2rem',
+            fontSize: '1rem',
+            fontWeight: 600,
+            borderRadius: '12px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(252, 76, 2, 0.3)'
+          }}
+          whileHover={{ 
+            scale: 1.05,
+            boxShadow: '0 6px 24px rgba(252, 76, 2, 0.4)'
+          }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => window.location.href = '/'}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          Back to Home
+        </motion.button>
+      </motion.div>
+    </div>
   );
 }
