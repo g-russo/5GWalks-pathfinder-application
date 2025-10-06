@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import MotionPathHero from '../components/MotionPathHero';
 import RouteCard from '../components/RouteCard';
+import DotGrid from '../components/DotGrid';
 import { FEATURED_ROUTES, preGenerateAllRoutes } from '../constants/featuredRoutes';
 import { walkAPI } from '../lib/api';
 import '../styles/Home.css';
@@ -61,6 +62,22 @@ export default function Home() {
           <div className="gradient-orb orb-1"></div>
           <div className="gradient-orb orb-2"></div>
           <div className="gradient-orb orb-3"></div>
+        </div>
+
+        {/* Interactive DotGrid Layer */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }}>
+          <DotGrid
+            dotSize={5}
+            gap={15}
+            baseColor="#332e2e"
+            baseOpacity={0.1}
+            activeColor="#CC4200"
+            proximity={120}
+            shockRadius={250}
+            shockStrength={5}
+            resistance={750}
+            returnDuration={1.5}
+          />
         </div>
 
         <div className="container hero-content">

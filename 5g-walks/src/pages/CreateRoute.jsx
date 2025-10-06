@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Save, Loader2, AlertCircle, MapPin, Clock, Footprints, Navigation, Route as RouteIcon } from 'lucide-react';
 import RouteForm from '../components/RouteForm';
 import MapView from '../components/MapView';
+import DotGrid from '../components/DotGrid';
 import { walkAPI, routesAPI } from '../lib/api';
 import '../styles/CreateRoute.css';
 
@@ -88,6 +89,22 @@ export default function CreateRoute() {
         <div className="hero-background">
           <div className="gradient-orb orb-1"></div>
           <div className="gradient-orb orb-2"></div>
+        </div>
+
+        {/* Interactive DotGrid Layer */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }}>
+          <DotGrid
+            dotSize={5}
+            gap={15}
+            baseColor="#332e2e"
+            baseOpacity={0.3}
+            activeColor="#CC4200"
+            proximity={120}
+            shockRadius={250}
+            shockStrength={5}
+            resistance={750}
+            returnDuration={1.5}
+          />
         </div>
 
         <div className="create-hero-container">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, Heart, Target } from 'lucide-react';
+import DotGrid from '../components/DotGrid';
 import '../styles/About.css';
 
 export default function About() {
@@ -112,6 +113,22 @@ export default function About() {
         <div className="about-hero-background">
           <div className="hero-gradient-orb orb-1"></div>
           <div className="hero-gradient-orb orb-2"></div>
+        </div>
+
+        {/* Interactive DotGrid Layer */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }}>
+          <DotGrid
+            dotSize={5}
+            gap={15}
+            baseColor="#332e2e"
+            baseOpacity={0.3}
+            activeColor="#CC4200"
+            proximity={120}
+            shockRadius={250}
+            shockStrength={5}
+            resistance={750}
+            returnDuration={1.5}
+          />
         </div>
 
         <div className="container">

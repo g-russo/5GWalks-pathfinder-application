@@ -148,6 +148,21 @@
   z-index: 1;
 }
 
+.about-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.3) 70%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  z-index: 10;
+}
+
 .about-hero-background {
   position: absolute;
   inset: 0;
