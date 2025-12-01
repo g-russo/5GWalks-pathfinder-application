@@ -39,7 +39,8 @@ export default function CreateRoute() {
         formData.startLocation,
         formData.endLocation,
         formData.routeType,
-        apiUnit === 'k' ? 'metric' : 'imperial'
+        apiUnit === 'k' ? 'metric' : 'imperial',
+        formData.waypoints || []
       );
 
       // Check if the API call was successful
@@ -52,6 +53,7 @@ export default function CreateRoute() {
         from: formData.startLocation,
         to: formData.endLocation,
         routeType: formData.routeType,
+        waypoints: formData.waypoints || [],
       });
 
       // Save preferences

@@ -56,24 +56,20 @@ export default function MapView({ route }) {
         console.log('📍 Shape points:', route.shape);
         console.log('📌 Locations:', route.locations);
         
-        // Get the API key
-        const apiKey = import.meta.env.VITE_MAPQUEST_API_KEY || 'bwZXOjnaffJU1JrjI2qV6cLJPtinN1D6';
-        
-        // Set the API key globally for MapQuest
-        if (window.L.mapquest) {
-          window.L.mapquest.key = apiKey;
-        }
-        
-        // Initialize the map with API key
-        const map = window.L.mapquest.map(mapRef.current, {
+        // Initialize the map with Leaflet (not MapQuest)
+        const map = window.L.map(mapRef.current, {
           center: route.locations && route.locations[0] 
             ? [route.locations[0].lat, route.locations[0].lng]
-            : [40.7128, -74.0060],
-          layers: window.L.mapquest.tileLayer('map', {
-            key: apiKey
-          }),
-          zoom: 13
+            : [14.5995, 120.9842], // Default to Manila
+          zoom: 13,
+          zoomControl: true
         });
+
+        // Add OpenStreetMap tile layer (free and reliable)
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19
+        }).addTo(map);
 
         // Store map instance
         mapInstanceRef.current = map;
@@ -98,63 +94,252 @@ export default function MapView({ route }) {
 
           // Add markers for start and end
           if (route.locations && route.locations.length >= 2) {
-            // Start marker (green)
+            // Start marker (green) - labeled as "START"
+            const startIcon = window.L.divIcon({
+              html: `
+                <div style="position: relative;">
+                  <div style="
+                    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+                    color: white;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50% 50% 50% 0;
+                    transform: rotate(-45deg);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                  ">
+                    <span style="transform: rotate(45deg); font-weight: bold; font-size: 11px;">S</span>
+                  </div>
+                </div>
+              `,
+              className: '',
+              iconSize: [36, 36],
+              iconAnchor: [18, 36],
+              popupAnchor: [0, -36]
+            });
+            
             window.L.marker([route.locations[0].lat, route.locations[0].lng], {
-              icon: window.L.mapquest.icons.marker({
-                primaryColor: '#22c55e',
-                secondaryColor: '#16a34a',
-                shadow: true
-              })
+              icon: startIcon
             }).addTo(map)
-              .bindPopup(`<strong>Start:</strong> ${route.locations[0].display}`);
+              .bindPopup(`
+                <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 200px;">
+                  <div style="font-weight: bold; color: #22c55e; margin-bottom: 8px; font-size: 14px;">START POINT</div>
+                  <div style="color: #374151; font-size: 13px;">${route.locations[0].display}</div>
+                </div>
+              `);
 
-            // End marker (red)
+            // Waypoint markers (orange) - numbered stops
+            if (route.locations.length > 2) {
+              for (let i = 1; i < route.locations.length - 1; i++) {
+                const stopNumber = i;
+                const waypointIcon = window.L.divIcon({
+                  html: `
+                    <div style="position: relative;">
+                      <div style="
+                        background: linear-gradient(135deg, #FC4C02 0%, #CC4200 100%);
+                        color: white;
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50% 50% 50% 0;
+                        transform: rotate(-45deg);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border: 3px solid white;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                      ">
+                        <span style="transform: rotate(45deg); font-weight: bold; font-size: 14px;">${stopNumber}</span>
+                      </div>
+                    </div>
+                  `,
+                  className: '',
+                  iconSize: [36, 36],
+                  iconAnchor: [18, 36],
+                  popupAnchor: [0, -36]
+                });
+                
+                window.L.marker([route.locations[i].lat, route.locations[i].lng], {
+                  icon: waypointIcon
+                }).addTo(map)
+                  .bindPopup(`
+                    <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 200px;">
+                      <div style="font-weight: bold; color: #FC4C02; margin-bottom: 8px; font-size: 14px;">STOP ${stopNumber}</div>
+                      <div style="color: #374151; font-size: 13px;">${route.locations[i].display}</div>
+                    </div>
+                  `);
+              }
+            }
+
+            // End marker (red) - labeled as "END"
             const lastIndex = route.locations.length - 1;
+            const endIcon = window.L.divIcon({
+              html: `
+                <div style="position: relative;">
+                  <div style="
+                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                    color: white;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50% 50% 50% 0;
+                    transform: rotate(-45deg);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                  ">
+                    <span style="transform: rotate(45deg); font-weight: bold; font-size: 11px;">E</span>
+                  </div>
+                </div>
+              `,
+              className: '',
+              iconSize: [36, 36],
+              iconAnchor: [18, 36],
+              popupAnchor: [0, -36]
+            });
+            
             window.L.marker([route.locations[lastIndex].lat, route.locations[lastIndex].lng], {
-              icon: window.L.mapquest.icons.marker({
-                primaryColor: '#ef4444',
-                secondaryColor: '#dc2626',
-                shadow: true
-              })
+              icon: endIcon
             }).addTo(map)
-              .bindPopup(`<strong>End:</strong> ${route.locations[lastIndex].display}`);
+              .bindPopup(`
+                <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 200px;">
+                  <div style="font-weight: bold; color: #ef4444; margin-bottom: 8px; font-size: 14px;">END POINT</div>
+                  <div style="color: #374151; font-size: 13px;">${route.locations[lastIndex].display}</div>
+                </div>
+              `);
           }
         } else {
           console.log('⚠️ No shape points found, attempting alternative route display');
           
-          // Alternative: Use MapQuest Directions API to draw route
-          if (route.locations && route.locations.length >= 2 && route.startLocation && route.endLocation) {
-            console.log('🔄 Using directions layer fallback');
+          // Alternative: Add markers only (if no route shape available)
+          if (route.locations && route.locations.length >= 2) {
+            console.log('📍 Adding markers for all locations');
             
-            window.L.mapquest.directions().route({
-              start: route.startLocation,
-              end: route.endLocation,
-              options: {
-                routeType: 'pedestrian',
-                enhancedNarrative: true,
-                locale: 'en_US',
-                unit: route.units === 'km' ? 'k' : 'm'
-              }
+            // Start marker
+            const startIcon = window.L.divIcon({
+              html: `
+                <div style="position: relative;">
+                  <div style="
+                    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+                    color: white;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50% 50% 50% 0;
+                    transform: rotate(-45deg);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                  ">
+                    <span style="transform: rotate(45deg); font-weight: bold; font-size: 11px;">S</span>
+                  </div>
+                </div>
+              `,
+              className: '',
+              iconSize: [36, 36],
+              iconAnchor: [18, 36],
+              popupAnchor: [0, -36]
             });
             
-            // Add markers for start/end
-            if (route.locations[0]) {
-              window.L.marker([route.locations[0].lat, route.locations[0].lng], {
-                icon: window.L.mapquest.icons.marker({
-                  primaryColor: '#22c55e',
-                  shadow: true
-                })
-              }).addTo(map).bindPopup(`<strong>Start:</strong> ${route.locations[0].display}`);
+            window.L.marker([route.locations[0].lat, route.locations[0].lng], {
+              icon: startIcon
+            }).addTo(map)
+              .bindPopup(`
+                <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 200px;">
+                  <div style="font-weight: bold; color: #22c55e; margin-bottom: 8px; font-size: 14px;">START POINT</div>
+                  <div style="color: #374151; font-size: 13px;">${route.locations[0].display}</div>
+                </div>
+              `);
+            
+            // Waypoint markers (if any)
+            if (route.locations.length > 2) {
+              for (let i = 1; i < route.locations.length - 1; i++) {
+                const stopNumber = i;
+                const waypointIcon = window.L.divIcon({
+                  html: `
+                    <div style="position: relative;">
+                      <div style="
+                        background: linear-gradient(135deg, #FC4C02 0%, #CC4200 100%);
+                        color: white;
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50% 50% 50% 0;
+                        transform: rotate(-45deg);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border: 3px solid white;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                      ">
+                        <span style="transform: rotate(45deg); font-weight: bold; font-size: 14px;">${stopNumber}</span>
+                      </div>
+                    </div>
+                  `,
+                  className: '',
+                  iconSize: [36, 36],
+                  iconAnchor: [18, 36],
+                  popupAnchor: [0, -36]
+                });
+                
+                window.L.marker([route.locations[i].lat, route.locations[i].lng], {
+                  icon: waypointIcon
+                }).addTo(map)
+                  .bindPopup(`
+                    <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 200px;">
+                      <div style="font-weight: bold; color: #FC4C02; margin-bottom: 8px; font-size: 14px;">STOP ${stopNumber}</div>
+                      <div style="color: #374151; font-size: 13px;">${route.locations[i].display}</div>
+                    </div>
+                  `);
+              }
             }
             
-            if (route.locations[1]) {
-              window.L.marker([route.locations[1].lat, route.locations[1].lng], {
-                icon: window.L.mapquest.icons.marker({
-                  primaryColor: '#ef4444',
-                  shadow: true
-                })
-              }).addTo(map).bindPopup(`<strong>End:</strong> ${route.locations[1].display}`);
-            }
+            // End marker
+            const lastIndex = route.locations.length - 1;
+            const endIcon = window.L.divIcon({
+              html: `
+                <div style="position: relative;">
+                  <div style="
+                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                    color: white;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50% 50% 50% 0;
+                    transform: rotate(-45deg);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                  ">
+                    <span style="transform: rotate(45deg); font-weight: bold; font-size: 11px;">E</span>
+                  </div>
+                </div>
+              `,
+              className: '',
+              iconSize: [36, 36],
+              iconAnchor: [18, 36],
+              popupAnchor: [0, -36]
+            });
+            
+            window.L.marker([route.locations[lastIndex].lat, route.locations[lastIndex].lng], {
+              icon: endIcon
+            }).addTo(map)
+              .bindPopup(`
+                <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 200px;">
+                  <div style="font-weight: bold; color: #ef4444; margin-bottom: 8px; font-size: 14px;">END POINT</div>
+                  <div style="color: #374151; font-size: 13px;">${route.locations[lastIndex].display}</div>
+                </div>
+              `);
+
+            // Fit map to all markers
+            const bounds = window.L.latLngBounds(
+              route.locations.map(loc => [loc.lat, loc.lng])
+            );
+            map.fitBounds(bounds, { padding: [50, 50] });
           }
         }
 

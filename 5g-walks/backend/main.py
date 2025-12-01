@@ -219,17 +219,20 @@ def create_walk_route(request_body: Dict[str, Any] = Body(...)):
     """
     Create an optimal walking route using MapQuest API.
     Only supports pedestrian modes: walking and running.
+    Supports multiple waypoints for complex routes.
     
     Request body:
     {
         "from_addr": "start address",
         "to": "destination address",
+        "waypoints": ["stop1", "stop2", ...],  # optional
         "route_type": "walking" or "running",
         "units": "metric" or "imperial" (optional, defaults to metric)
     }
     """
     from_addr = request_body.get('from_addr')
     to = request_body.get('to')
+    waypoints = request_body.get('waypoints', [])
     route_type = request_body.get('route_type', 'walking')
     units = request_body.get('units', 'metric')
     
@@ -241,25 +244,37 @@ def create_walk_route(request_body: Dict[str, Any] = Body(...)):
     if route_type not in ['walking', 'running']:
         raise HTTPException(status_code=400, detail="route_type must be 'walking' or 'running'")
     
+    # Filter out empty waypoints
+    waypoints = [wp.strip() for wp in waypoints if wp and wp.strip()]
+    
     key = os.getenv("MAPQUEST_API_KEY") or os.getenv("VITE_MAPQUEST_API_KEY")
     if not key:
         raise HTTPException(status_code=500, detail="MapQuest API key not configured on backend (MAPQUEST_API_KEY).")
 
     unit_param = "k" if units == "metric" else "m"
     
-    # MapQuest pedestrian routing parameters
-    params = {
-        "key": key,
-        "from": from_addr,
-        "to": to,
-        "unit": unit_param,
-        "routeType": "pedestrian",  # Always use pedestrian routing
-        "narrativeType": "text",
+    # Build locations list: start + waypoints + end
+    locations = [from_addr]
+    if waypoints:
+        locations.extend(waypoints)
+    locations.append(to)
+    
+    # MapQuest pedestrian routing parameters with waypoints
+    payload = {
+        "locations": locations,
+        "options": {
+            "unit": unit_param,
+            "routeType": "pedestrian",  # Always use pedestrian routing
+            "narrativeType": "text",
+            "enhancedNarrative": True,
+            "shapeFormat": "raw",
+            "generalize": 0,
+        }
     }
 
-    url = "http://www.mapquestapi.com/directions/v2/route"
+    url = f"http://www.mapquestapi.com/directions/v2/route?key={key}"
     try:
-        resp = requests.get(url, params=params, timeout=15)
+        resp = requests.post(url, json=payload, timeout=15)
     except requests.RequestException as e:
         raise HTTPException(status_code=502, detail=f"Error contacting MapQuest: {e}")
 

@@ -46,18 +46,22 @@ export const routesAPI = {
 // Walk API - Creates optimal walking routes
 export const walkAPI = {
   // Create a walking route using the backend /walk endpoint
-  createWalkRoute: async (fromAddr, toAddr, routeType = 'walking', units = 'metric') => {
+  createWalkRoute: async (fromAddr, toAddr, routeType = 'walking', units = 'metric', waypoints = []) => {
     try {
       // Validate route type - only walking and running allowed
       if (routeType !== 'walking' && routeType !== 'running') {
         throw new Error('Only walking and running route types are supported');
       }
 
+      // Filter out empty waypoints
+      const validWaypoints = waypoints.filter(wp => wp && wp.trim());
+
       const response = await api.post('/walk', {
         from_addr: fromAddr,
         to: toAddr,
         route_type: routeType,
         units: units,
+        waypoints: validWaypoints,
       });
       return response.data;
     } catch (error) {

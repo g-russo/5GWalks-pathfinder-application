@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { AlertCircle, PersonStanding, Footprints } from 'lucide-react';
+import { AlertCircle, PersonStanding, Footprints, Plus, X } from 'lucide-react';
 import { getPreferences, updatePreferences } from '../lib/localStorage';
 import { UNIT_TYPES, getUnitLabel } from '../lib/units';
 
@@ -20,6 +20,7 @@ export default function RouteForm({ onSubmit, initialData }) {
     endLocation: safeInitialData.endLocation || '',
     routeType: safeInitialData.routeType || preferences.routeType || 'walking',
     units: safeInitialData.units || preferences.units || UNIT_TYPES.METRIC,
+    waypoints: safeInitialData.waypoints || [],
   });
 
   const [validationErrors, setValidationErrors] = useState({});
@@ -35,6 +36,7 @@ export default function RouteForm({ onSubmit, initialData }) {
         endLocation: initialData.endLocation || '',
         routeType: initialData.routeType || preferences.routeType || 'walking',
         units: initialData.units || preferences.units || UNIT_TYPES.METRIC,
+        waypoints: initialData.waypoints || [],
       });
     }
   }, [initialData]);
@@ -87,6 +89,27 @@ export default function RouteForm({ onSubmit, initialData }) {
     
     setValidationErrors(prev => ({ ...prev, [fieldName]: error }));
     return !error;
+  };
+
+  const addWaypoint = () => {
+    setFormData(prev => ({
+      ...prev,
+      waypoints: [...prev.waypoints, ''],
+    }));
+  };
+
+  const removeWaypoint = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      waypoints: prev.waypoints.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateWaypoint = (index, value) => {
+    setFormData(prev => ({
+      ...prev,
+      waypoints: prev.waypoints.map((wp, i) => i === index ? value : wp),
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -204,6 +227,93 @@ export default function RouteForm({ onSubmit, initialData }) {
               <AlertCircle size={16} />
               <span>{validationErrors.endLocation}</span>
             </div>
+          )}
+        </div>
+
+        {/* Waypoints Section */}
+        <div className="form-section">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <label className="form-label" style={{ margin: 0 }}>
+              <span className="label-text">Stops Along the Way</span>
+              <span className="label-optional" style={{ marginLeft: '0.5rem' }}>(optional)</span>
+            </label>
+            <button
+              type="button"
+              onClick={addWaypoint}
+              style={{
+                background: 'rgba(252, 76, 2, 0.1)',
+                color: '#FC4C02',
+                border: 'none',
+                padding: '0.5rem 0.875rem',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => e.target.style.background = 'rgba(252, 76, 2, 0.15)'}
+              onMouseLeave={(e) => e.target.style.background = 'rgba(252, 76, 2, 0.1)'}
+            >
+              <Plus size={16} />
+              Add Stop
+            </button>
+          </div>
+
+          {formData.waypoints.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {formData.waypoints.map((waypoint, index) => (
+                <div key={index} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1, minWidth: '0' }}>
+                    <Input
+                      type="text"
+                      placeholder={`Stop ${index + 1} (e.g., Manila City Hall)`}
+                      value={waypoint}
+                      onChange={(e) => updateWaypoint(index, e.target.value)}
+                      className="form-input"
+                      style={{
+                        height: '56px',
+                        fontSize: '16px',
+                        padding: '1rem 1.25rem',
+                        width: '100%',
+                      }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeWaypoint(index)}
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      color: '#dc2626',
+                      border: 'none',
+                      padding: '0.875rem',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s',
+                      minHeight: '56px',
+                      minWidth: '56px',
+                      flexShrink: 0,
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.15)'}
+                    onMouseLeave={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.1)'}
+                    aria-label={`Remove stop ${index + 1}`}
+                  >
+                    <X size={22} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {formData.waypoints.length === 0 && (
+            <p style={{ fontSize: '0.875rem', color: '#999', fontStyle: 'italic', margin: 0 }}>
+              No stops added. Click "Add Stop" to include waypoints in your route.
+            </p>
           )}
         </div>
 

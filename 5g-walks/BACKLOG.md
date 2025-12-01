@@ -8,6 +8,7 @@ Backlog for MapQuest enhancements
 - ✅ Add localization and more unit options (meters, kilometers, miles).
 - ✅ Improve error handling and show helpful messages for address not found.
 - ✅ Replace fetch with axios and add retry/backoff for backend calls.
+- ✅ Added multiple waypoints/ stops features. 
 
 ## 🔜 Pending
 - Allow multiple waypoints and route optimization.
