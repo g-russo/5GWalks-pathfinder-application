@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Share2, Heart, MapPin, Clock, Navigation, Loader2, Info, Footprints } from 'lucide-react';
+import { ArrowLeft, Share2, Heart, MapPin, Clock, Navigation, Loader2, Info, Footprints, Check } from 'lucide-react';
 import MapView from '../components/MapView';
 import { walkAPI } from '../lib/api';
 import { FEATURED_ROUTES, getCachedRouteData } from '../constants/featuredRoutes';
+import { saveRoute, getSavedRoutes } from '../lib/localStorage';
 import '../styles/RouteDetail.css';
 
 export default function RouteDetail() {
@@ -15,11 +16,27 @@ export default function RouteDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [isFavorited, setIsFavorited] = useState(false);
   const [error, setError] = useState(null);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
 
   useEffect(() => {
     loadFeaturedRoute();
+    checkIfSaved();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  const checkIfSaved = () => {
+    const savedRoutes = getSavedRoutes();
+    const featured = FEATURED_ROUTES.find(r => r.id === parseInt(id));
+    if (featured) {
+      const alreadySaved = savedRoutes.some(
+        r => r.name === featured.name && 
+            r.startLocation === featured.startLocation && 
+            r.endLocation === featured.endLocation
+      );
+      setIsFavorited(alreadySaved);
+    }
+  };
 
   const loadFeaturedRoute = async () => {
     setIsLoading(true);
@@ -80,10 +97,48 @@ export default function RouteDetail() {
   };
 
   const handleFavorite = () => {
-    setIsFavorited(!isFavorited);
-    // TODO: In production, save to backend
-    const message = isFavorited ? 'Removed from favorites' : 'Added to favorites';
-    console.log(message);
+    if (isFavorited) {
+      // Already saved, do nothing or show message
+      showNotificationMessage('This route is already in My Routes');
+      return;
+    }
+
+    // Save to localStorage
+    if (routeData && featuredRoute) {
+      const routeToSave = {
+        name: featuredRoute.name,
+        description: featuredRoute.description,
+        startLocation: featuredRoute.startLocation,
+        endLocation: featuredRoute.endLocation,
+        routeType: featuredRoute.type || 'walking',
+        distance: routeData.distance || featuredRoute.distance,
+        duration: routeData.time_seconds ? routeData.time_seconds / 60 : (featuredRoute.duration || 0),
+        units: routeData.units || 'km',
+        unitType: 'metric',
+        shape: routeData.shape || [],
+        steps: routeData.steps || [],
+        locations: routeData.locations || [],
+        staticMapUrl: routeData.static_map_url,
+        directionsLink: routeData.directions_link,
+      };
+
+      const saved = saveRoute(routeToSave);
+      
+      if (saved) {
+        setIsFavorited(true);
+        showNotificationMessage('Route added to My Routes! ✓');
+      } else {
+        showNotificationMessage('This route is already saved');
+      }
+    }
+  };
+
+  const showNotificationMessage = (message) => {
+    setNotificationMessage(message);
+    setShowNotification(true);
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 3000);
   };
 
   // Loading state
@@ -155,6 +210,37 @@ export default function RouteDetail() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
+      {/* Notification Toast */}
+      <AnimatePresence>
+        {showNotification && (
+          <motion.div
+            style={{
+              position: 'fixed',
+              top: '100px',
+              right: '2rem',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: 'white',
+              padding: '1rem 1.5rem',
+              borderRadius: '12px',
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              zIndex: 9999,
+              fontSize: '1rem',
+              fontWeight: 500,
+            }}
+            initial={{ opacity: 0, y: -20, x: 100 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: -20, x: 100 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Check size={20} />
+            <span>{notificationMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Grid Background with Glowing Lines */}
       <div className="grid-background">
         <div className="grid-pattern"></div>

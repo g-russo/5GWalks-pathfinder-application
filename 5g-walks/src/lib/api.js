@@ -138,6 +138,61 @@ export const mapQuestAPI = {
   },
 };
 
+/**
+ * Retry configuration
+ */
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelay: 1000, // 1 second
+  maxDelay: 10000, // 10 seconds
+  retryableStatuses: [408, 429, 500, 502, 503, 504],
+  retryableMethods: ['get', 'put', 'head', 'delete', 'options', 'post'],
+};
+
+/**
+ * Calculate exponential backoff delay
+ */
+const getRetryDelay = (retryCount) => {
+  const delay = RETRY_CONFIG.baseDelay * Math.pow(2, retryCount);
+  const jitter = Math.random() * 1000; // Add jitter to prevent thundering herd
+  return Math.min(delay + jitter, RETRY_CONFIG.maxDelay);
+};
+
+/**
+ * Check if request should be retried
+ */
+const shouldRetry = (error, retryCount) => {
+  // Don't retry if max retries reached
+  if (retryCount >= RETRY_CONFIG.maxRetries) {
+    return false;
+  }
+
+  // Don't retry if no config (means request wasn't sent)
+  if (!error.config) {
+    return false;
+  }
+
+  // Only retry certain HTTP methods
+  const method = error.config.method?.toLowerCase();
+  if (!RETRY_CONFIG.retryableMethods.includes(method)) {
+    return false;
+  }
+
+  // Retry on network errors
+  if (error.code === 'ERR_NETWORK' || !error.response) {
+    return true;
+  }
+
+  // Retry on specific status codes
+  const status = error.response?.status;
+  return RETRY_CONFIG.retryableStatuses.includes(status);
+};
+
+/**
+ * Sleep utility for retry delays
+ */
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
@@ -146,6 +201,10 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Initialize retry count
+    config.retryCount = config.retryCount || 0;
+    
     return config;
   },
   (error) => {
@@ -153,15 +212,37 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor with retry logic
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const config = error.config;
+
+    // Handle unauthorized access
     if (error.response?.status === 401) {
-      // Handle unauthorized access
       localStorage.removeItem('authToken');
       window.location.href = '/login';
+      return Promise.reject(error);
     }
+
+    // Check if we should retry
+    if (shouldRetry(error, config.retryCount)) {
+      config.retryCount = (config.retryCount || 0) + 1;
+      
+      const delay = getRetryDelay(config.retryCount);
+      
+      console.log(
+        `Retrying request (attempt ${config.retryCount}/${RETRY_CONFIG.maxRetries}) ` +
+        `after ${Math.round(delay)}ms delay...`
+      );
+
+      // Wait before retrying
+      await sleep(delay);
+
+      // Retry the request
+      return api(config);
+    }
+
     return Promise.reject(error);
   }
 );

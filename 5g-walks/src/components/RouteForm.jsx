@@ -3,17 +3,23 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { AlertCircle, PersonStanding, Footprints } from 'lucide-react';
+import { getPreferences, updatePreferences } from '../lib/localStorage';
+import { UNIT_TYPES, getUnitLabel } from '../lib/units';
 
 export default function RouteForm({ onSubmit, initialData }) {
   // Ensure initialData is always an object, even if null or undefined is passed
   const safeInitialData = initialData || {};
+  
+  // Load preferences
+  const preferences = getPreferences();
   
   const [formData, setFormData] = useState({
     name: safeInitialData.name || '',
     description: safeInitialData.description || '',
     startLocation: safeInitialData.startLocation || '',
     endLocation: safeInitialData.endLocation || '',
-    routeType: safeInitialData.routeType || 'walking',
+    routeType: safeInitialData.routeType || preferences.routeType || 'walking',
+    units: safeInitialData.units || preferences.units || UNIT_TYPES.METRIC,
   });
 
   const [validationErrors, setValidationErrors] = useState({});
@@ -27,7 +33,8 @@ export default function RouteForm({ onSubmit, initialData }) {
         description: initialData.description || '',
         startLocation: initialData.startLocation || '',
         endLocation: initialData.endLocation || '',
-        routeType: initialData.routeType || 'walking',
+        routeType: initialData.routeType || preferences.routeType || 'walking',
+        units: initialData.units || preferences.units || UNIT_TYPES.METRIC,
       });
     }
   }, [initialData]);
@@ -38,6 +45,11 @@ export default function RouteForm({ onSubmit, initialData }) {
       ...prev,
       [name]: value,
     }));
+    
+    // Save unit preference when changed
+    if (name === 'units') {
+      updatePreferences({ units: value });
+    }
     
     // Clear validation error when user starts typing
     if (validationErrors[name]) {
@@ -230,6 +242,24 @@ export default function RouteForm({ onSubmit, initialData }) {
               </div>
             </label>
           </div>
+        </div>
+
+        <div className="form-section">
+          <label htmlFor="units" className="form-label">
+            <span className="label-text">Distance Unit</span>
+          </label>
+          <select
+            id="units"
+            name="units"
+            value={formData.units}
+            onChange={handleChange}
+            className="form-input"
+            style={{ cursor: 'pointer' }}
+          >
+            <option value={UNIT_TYPES.METRIC}>{getUnitLabel(UNIT_TYPES.METRIC)}</option>
+            <option value={UNIT_TYPES.IMPERIAL}>{getUnitLabel(UNIT_TYPES.IMPERIAL)}</option>
+            <option value={UNIT_TYPES.METERS}>{getUnitLabel(UNIT_TYPES.METERS)}</option>
+          </select>
         </div>
 
         <button type="submit" className="form-submit-btn">

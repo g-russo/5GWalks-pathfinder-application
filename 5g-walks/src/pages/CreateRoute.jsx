@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Save, Loader2, AlertCircle, MapPin, Clock, Footprints, Navigation, Route as RouteIcon } from 'lucide-react';
@@ -6,6 +6,9 @@ import RouteForm from '../components/RouteForm';
 import MapView from '../components/MapView';
 import DotGrid from '../components/DotGrid';
 import { walkAPI, routesAPI } from '../lib/api';
+import { getPreferences, updatePreferences, addRecentSearch, saveRoute } from '../lib/localStorage';
+import { formatDistance, formatDuration, getApiUnit, UNIT_TYPES } from '../lib/units';
+import { formatErrorMessage, logError } from '../lib/errorHandler';
 import '../styles/CreateRoute.css';
 
 export default function CreateRoute() {
@@ -14,24 +17,48 @@ export default function CreateRoute() {
   const [routeData, setRouteData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [preferences, setPreferences] = useState(getPreferences());
+
+  // Load preferences on mount
+  useEffect(() => {
+    const prefs = getPreferences();
+    setPreferences(prefs);
+  }, []);
 
   const handleFormSubmit = async (formData) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      // Get unit preference from form data
+      const unitType = formData.units || preferences.units || UNIT_TYPES.METRIC;
+      const apiUnit = getApiUnit(unitType);
+
       // Create walking route using the backend /walk endpoint
       const walkResponse = await walkAPI.createWalkRoute(
         formData.startLocation,
         formData.endLocation,
         formData.routeType,
-        'metric' // Using metric system (kilometers)
+        apiUnit === 'k' ? 'metric' : 'imperial'
       );
 
       // Check if the API call was successful
       if (!walkResponse.success) {
         throw new Error('Failed to generate walking route');
       }
+
+      // Save to recent searches
+      addRecentSearch({
+        from: formData.startLocation,
+        to: formData.endLocation,
+        routeType: formData.routeType,
+      });
+
+      // Save preferences
+      updatePreferences({ 
+        routeType: formData.routeType,
+        units: unitType,
+      });
 
       // Extract route information
       const newRouteData = {
@@ -45,13 +72,22 @@ export default function CreateRoute() {
         staticMapUrl: walkResponse.static_map_url,
         directionsLink: walkResponse.directions_link,
         units: walkResponse.units || 'km',
+        unitType: unitType, // Store unit type for display
       };
 
       console.log('Route data received:', newRouteData); // Debug log
       setRouteData(newRouteData);
     } catch (err) {
       console.error('Error generating walking route:', err);
-      setError(err.response?.data?.detail || 'Failed to generate walking route. Please check your locations and try again.');
+      
+      // Use error handler to get user-friendly message
+      const errorInfo = formatErrorMessage(err);
+      logError(err, { 
+        context: 'CreateRoute.handleFormSubmit',
+        formData 
+      });
+      
+      setError(errorInfo);
     } finally {
       setIsLoading(false);
     }
@@ -61,11 +97,24 @@ export default function CreateRoute() {
     if (!routeData) return;
 
     try {
-      const response = await routesAPI.createRoute(routeData);
-      navigate(`/route/${response.data.id}`);
+      // Save to localStorage instead of backend
+      const saved = saveRoute(routeData);
+      
+      if (saved) {
+        // Navigate to the saved routes page
+        navigate('/saved');
+      } else {
+        // Route already exists
+        setError({
+          title: 'Duplicate Route',
+          message: 'This route has already been saved to My Routes.',
+          suggestions: ['Check your My Routes page', 'Try creating a different route'],
+        });
+      }
     } catch (err) {
       console.error('Error saving route:', err);
-      setError('Failed to save route. Please try again.');
+      const errorInfo = formatErrorMessage(err);
+      setError(errorInfo);
     }
   };
 
@@ -153,7 +202,17 @@ export default function CreateRoute() {
                     exit={{ opacity: 0, height: 0 }}
                   >
                     <AlertCircle size={18} />
-                    <p>{error}</p>
+                    <div className="error-content">
+                      <strong>{error.title || 'Error'}</strong>
+                      <p>{error.message || error}</p>
+                      {error.suggestions && error.suggestions.length > 0 && (
+                        <ul className="error-suggestions">
+                          {error.suggestions.map((suggestion, idx) => (
+                            <li key={idx}>{suggestion}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -202,11 +261,11 @@ export default function CreateRoute() {
                     <div className="route-stats-preview">
                       <div className="stat">
                         <MapPin size={18} />
-                        <span>{routeData?.distance ? routeData.distance.toFixed(2) : '0.00'} km</span>
+                        <span>{formatDistance(routeData?.distance || 0, routeData?.unitType || UNIT_TYPES.METRIC)}</span>
                       </div>
                       <div className="stat">
                         <Clock size={18} />
-                        <span>{routeData?.duration ? Math.round(routeData.duration) : 0} min</span>
+                        <span>{formatDuration((routeData?.duration || 0) * 60)}</span>
                       </div>
                       <div className="stat">
                         <Footprints size={18} />
@@ -274,9 +333,7 @@ export default function CreateRoute() {
                                 </p>
                                 {typeof step.distance === 'number' && step.distance >= 0.05 && (
                                   <p className="step-distance">
-                                    {step.distance < 1 
-                                      ? `${Math.round(step.distance * 1000)} m` 
-                                      : `${step.distance.toFixed(2)} km`}
+                                    {formatDistance(step.distance, routeData?.unitType || UNIT_TYPES.METRIC)}
                                   </p>
                                 )}
                               </div>
